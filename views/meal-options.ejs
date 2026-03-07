@@ -17,11 +17,11 @@
   <div class="container mt-5">
     <div class="card">
       <div class="card-header">
-        <h1><i class="fas fa-utensils"></i> Meals</h1>
+        <h1><i class="fas fa-utensils"></i> Meal Options</h1>
       </div>
       <div class="card-body">
         <h2>Add New Meal</h2>
-        <form id="addMealForm" action="/meals" method="POST">
+        <form id="addMealForm" action="/meal-options" method="POST">
           <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input type="text" class="form-control" id="title" name="title" required>
@@ -79,7 +79,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="editMealForm" action="/meals" method="POST">
+          <form id="editMealForm" action="/meal-options" method="POST">
             <input type="hidden" id="editMealId" name="id">
             <div class="mb-3">
               <label for="editTitle" class="form-label">Title</label>

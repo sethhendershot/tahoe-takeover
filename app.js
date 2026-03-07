@@ -131,7 +131,7 @@ app.post('/meal-guide', (req, res) => {
 });
 
 // Placeholder for meal planning routes
-app.get('/meals', (req, res) => {
+app.get('/meal-options', (req, res) => {
   if (!req.session.user) {
     if (req.accepts('html')) {
       return res.redirect('/');
@@ -141,13 +141,13 @@ app.get('/meals', (req, res) => {
   }
   const data = readData();
   if (req.accepts('html')) {
-    res.render('meals', { meals: data.meals });
+    res.render('meal-options', { meals: data.meals });
   } else {
     res.json(data.meals);
   }
 });
 
-app.post('/meals', (req, res) => {
+app.post('/meal-options', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ success: false, message: 'Please log in first' });
   }
@@ -192,6 +192,22 @@ app.post('/meals', (req, res) => {
       writeData(data);
       return res.json({ success: true, message: 'Meal added successfully', meal });
     }
+  }
+});
+
+app.get('/meals-list', (req, res) => {
+  if (!req.session.user) {
+    if (req.accepts('html')) {
+      return res.redirect('/');
+    } else {
+      return res.status(401).send('Please log in first');
+    }
+  }
+  const data = readData();
+  if (req.accepts('html')) {
+    res.render('meal-list', { meals: data.meals });
+  } else {
+    res.json(data.meals);
   }
 });
 
