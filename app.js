@@ -9,7 +9,6 @@ app.set('view engine', 'ejs');
 const dataPath = path.join(__dirname, 'meal-options.json');
 const mealsPath = path.join(__dirname, 'meals.json');
 const guidePath = path.join(__dirname, 'meal-guide.json');
-const guidePath = path.join(__dirname, 'meal-guide.json');
 
 // Helper functions
 function readData() {
