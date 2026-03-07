@@ -1,19 +1,13 @@
 {
   "non-training": [
-    { "meal": 1, "protein": 30, "carb": 40, "fats": 0 },
-    { "meal": 2, "protein": 30, "carb": 30, "fats": 0 },
-    { "meal": 3, "protein": 30, "carb": 20, "fats": 0 },
-    { "meal": 4, "protein": 30, "carb": 0, "fats": 7 },
-    { "meal": 5, "protein": 25, "carb": 0, "fats": 7 }
+    {
+      "meal": 1,
+      "protein": 12,
+      "carb": 2,
+      "fats": 0,
+      "note": ""
+    }
   ],
-  "training": [
-    { "meal": 1, "protein": 30, "carb": 0, "fats": 14 },
-    { "meal": 2, "protein": 30, "carb": 45, "fats": 0 },
-    { "meal": 3, "protein": 30, "carb": 30, "fats": 0 },
-    { "meal": 4, "protein": 25, "carb": 30, "fats": 0 },
-    { "meal": 5, "protein": 25, "carb": 20, "fats": 0 },
-    { "meal": 6, "protein": 25, "carb": 0, "fats": 7 }
-  ],
+  "training": [],
   "check-in": []
-}</content>
-<parameter name="filePath">c:\Users\seth\App Projects\Tahoe Takeover\meal-guide.json
+}

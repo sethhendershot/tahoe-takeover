@@ -9,6 +9,7 @@ app.set('view engine', 'ejs');
 const dataPath = path.join(__dirname, 'meal-options.json');
 const mealsPath = path.join(__dirname, 'meals.json');
 const guidePath = path.join(__dirname, 'meal-guide.json');
+const guidePath = path.join(__dirname, 'meal-guide.json');
 
 // Helper functions
 function readData() {
@@ -99,18 +100,18 @@ app.get('/meal-guide', (req, res) => {
 
 app.post('/meal-guide', (req, res) => {
   if (!req.session.isAdmin) return res.status(403).json({ success: false, message: 'Admin access required' });
-  const { action, dayType, meal, protein, carb, fats, id } = req.body;
+  const { action, dayType, meal, protein, carb, fats, note, id } = req.body;
   const guide = readGuide();
   if (!guide[dayType]) guide[dayType] = [];
   if (action === 'add') {
-    const newMeal = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+    const newMeal = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats), note: note || '' };
     guide[dayType].push(newMeal);
     writeGuide(guide);
     res.json({ success: true });
   } else if (action === 'edit') {
     const index = guide[dayType].findIndex(m => m.meal === parseInt(id));
     if (index !== -1) {
-      guide[dayType][index] = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+      guide[dayType][index] = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats), note: note || '' };
       writeGuide(guide);
       res.json({ success: true });
     } else {
