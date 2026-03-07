@@ -139,6 +139,13 @@
       "protein": 30,
       "carb": 0,
       "fats": 0
+    },
+    {
+      "id": 1772891656154,
+      "title": "test",
+      "protein": 33,
+      "carb": 0,
+      "fats": 0
     }
   ],
   "dayPlans": []

@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 app.set('view engine', 'ejs');
-const dataPath = path.join(__dirname, 'data.json');
+const dataPath = path.join(__dirname, 'meal-options.json');
 
 // Helper functions
 function readData() {
