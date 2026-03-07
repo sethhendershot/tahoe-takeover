@@ -122,7 +122,7 @@
   <script>
     $(document).ready(function() {
       $('#mealsTable').DataTable();
-      $('.edit-btn').on('click', function() {
+      $('#mealsTable').on('click', '.edit-btn', function() {
         const id = $(this).data('id');
         const title = $(this).data('title');
         const protein = $(this).data('protein');
