@@ -22,14 +22,16 @@ A Node.js Express application for collecting meal planning data with secure logi
 ## Features
 
 - Secure login with sessions
-- Basic meal planning routes (placeholder)
+- Meal planning data stored in data.json
+- CRUD operations for meals
 
 ## API Endpoints
 
 - GET / - Check login status
 - POST /login - Login with username
 - POST /logout - Logout
-- GET /meals - Get meal planning data (requires login)
+- GET /meals - Get all meals (requires login)
+- POST /meals - Add a new meal (requires login, body: {name, date, ...})
 
 ## Development
 
