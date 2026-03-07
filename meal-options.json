@@ -50,13 +50,6 @@
       "fats": 0
     },
     {
-      "id": 1772889666938,
-      "title": "protein powder = properly measured 30g",
-      "protein": 30,
-      "carb": 0,
-      "fats": 0
-    },
-    {
       "id": 1772889704066,
       "title": "Tilapia = 4.2 oz cooked",
       "protein": 25,
@@ -106,13 +99,6 @@
       "fats": 0
     },
     {
-      "id": 1772890114985,
-      "title": "protein powder = properly measured 30g",
-      "protein": 30,
-      "carb": 0,
-      "fats": 0
-    },
-    {
       "id": 1772890705555,
       "title": "protein powder = properly measured 25g",
       "protein": 25,
@@ -120,30 +106,9 @@
       "fats": 0
     },
     {
-      "id": 1772890731122,
-      "title": "protein powder = properly measured 30g",
-      "protein": 30,
-      "carb": 0,
-      "fats": 0
-    },
-    {
-      "id": 1772890756076,
-      "title": "protein powder = properly measured2",
-      "protein": 30,
-      "carb": 0,
-      "fats": 0
-    },
-    {
       "id": 1772890893411,
       "title": "protein powder = properly measured 30g",
       "protein": 30,
-      "carb": 0,
-      "fats": 0
-    },
-    {
-      "id": 1772891656154,
-      "title": "test",
-      "protein": 33,
       "carb": 0,
       "fats": 0
     }

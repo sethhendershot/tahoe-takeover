@@ -7,6 +7,7 @@ const path = require('path');
 const app = express();
 app.set('view engine', 'ejs');
 const dataPath = path.join(__dirname, 'meal-options.json');
+const mealsPath = path.join(__dirname, 'meals.json');
 
 // Helper functions
 function readData() {
@@ -20,6 +21,19 @@ function readData() {
 
 function writeData(data) {
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+}
+
+function readMeals() {
+  try {
+    const data = fs.readFileSync(mealsPath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return {};
+  }
+}
+
+function writeMeals(data) {
+  fs.writeFileSync(mealsPath, JSON.stringify(data, null, 2));
 }
 
 // Middleware
@@ -132,8 +146,7 @@ app.get('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'training' && p.user === req.session.user) || null;
-  res.render('training-day', { meals: data.meals, dayPlan, selectedDate });
+  res.render('training-day', { meals: data.meals, selectedDate });
 });
 
 app.get('/not-training-day', (req, res) => {
@@ -203,6 +216,24 @@ app.get('/day-plans', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   res.render('day-plans', { dayPlans: data.dayPlans });
+});
+
+app.get('/load-meals', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const date = req.query.date;
+  const mealsData = readMeals();
+  const dayMeals = mealsData[date] || {};
+  res.json(dayMeals);
+});
+
+app.post('/update-meal', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date, mealNum, mealId } = req.body;
+  const mealsData = readMeals();
+  if (!mealsData[date]) mealsData[date] = {};
+  mealsData[date][mealNum] = mealId;
+  writeMeals(mealsData);
+  res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
