@@ -49,7 +49,7 @@
                 <td><%= totalProtein %></td>
                 <td><%= totalCarbs %></td>
                 <td><%= totalFats %></td>
-                <td><a href="/<%= typeRoute %>?date=<%= date %>" class="btn btn-primary btn-sm">View Meals</a></td>
+                <td><a href="/<%= typeRoute %>?date=<%= date %>" class="btn btn-primary btn-sm">View Meals</a> <form action="/delete-meals" method="POST" style="display:inline;"><input type="hidden" name="date" value="<%= date %>"><button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete all meals for this date?')">Delete</button></form></td>
               </tr>
             <% }); %>
           </tbody>

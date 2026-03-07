@@ -212,6 +212,17 @@ app.get('/meals-list', (req, res) => {
   }
 });
 
+app.post('/delete-meals', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  const { date } = req.body;
+  const mealsData = readMeals();
+  if (mealsData[date]) {
+    delete mealsData[date];
+    writeMeals(mealsData);
+  }
+  res.redirect('/meals-list');
+});
+
 app.get('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
