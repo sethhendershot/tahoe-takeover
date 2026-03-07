@@ -80,12 +80,12 @@ app.post('/meals', (req, res) => {
   if (!req.session.user) {
     return res.status(401).send('Please log in first');
   }
-  const newMeal = req.body;
-  if (!newMeal.name || !newMeal.date) {
-    return res.status(400).send('Meal name and date required');
+  const { title, protein, carb, fats } = req.body;
+  if (!title || protein == null || carb == null || fats == null) {
+    return res.status(400).send('All fields required');
   }
   const data = readData();
-  const meal = { id: Date.now(), ...newMeal };
+  const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
   data.meals.push(meal);
   writeData(data);
   if (req.accepts('html')) {
@@ -97,17 +97,71 @@ app.post('/meals', (req, res) => {
 
 app.get('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  res.render('training-day');
+  const data = readData();
+  res.render('training-day', { meals: data.meals });
 });
 
 app.get('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  res.render('not-training-day');
+  const data = readData();
+  res.render('not-training-day', { meals: data.meals });
 });
 
 app.get('/check-in-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   res.render('check-in-day');
+});
+
+app.post('/training-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  const data = readData();
+  const dayPlan = {
+    id: Date.now(),
+    date: new Date().toISOString().split('T')[0],
+    type: 'training',
+    user: req.session.user,
+    meals: []
+  };
+  for (let i = 1; i <= 6; i++) {
+    dayPlan.meals.push({
+      slot: i,
+      protein: { amount: parseFloat(req.body['protein' + i]), mealId: req.body['proteinMeal' + i] },
+      carbs: { amount: parseFloat(req.body['carbs' + i]), mealId: req.body['carbsMeal' + i] },
+      fats: { amount: parseFloat(req.body['fats' + i]), mealId: req.body['fatsMeal' + i] }
+    });
+  }
+  data.dayPlans.push(dayPlan);
+  writeData(data);
+  res.redirect('/day-plans');
+});
+
+app.post('/not-training-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  const data = readData();
+  const dayPlan = {
+    id: Date.now(),
+    date: new Date().toISOString().split('T')[0],
+    type: 'not-training',
+    user: req.session.user,
+    meals: []
+  };
+  for (let i = 1; i <= 5; i++) {
+    dayPlan.meals.push({
+      slot: i,
+      protein: { amount: parseFloat(req.body['protein' + i]), mealId: req.body['proteinMeal' + i] },
+      carbs: { amount: parseFloat(req.body['carbs' + i]), mealId: req.body['carbsMeal' + i] },
+      fats: { amount: parseFloat(req.body['fats' + i]), mealId: req.body['fatsMeal' + i] }
+    });
+  }
+  data.dayPlans.push(dayPlan);
+  writeData(data);
+  res.redirect('/day-plans');
+});
+
+app.get('/day-plans', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  const data = readData();
+  res.render('day-plans', { dayPlans: data.dayPlans });
 });
 
 const PORT = process.env.PORT || 3000;

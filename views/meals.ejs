@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meals</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css">
 </head>
 <body class="bg-light">
   <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -28,31 +29,60 @@
         <h2>Add New Meal</h2>
         <form action="/meals" method="POST">
           <div class="mb-3">
-            <label for="name" class="form-label">Meal Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
           </div>
           <div class="mb-3">
-            <label for="date" class="form-label">Date</label>
-            <input type="date" class="form-control" id="date" name="date" required>
+            <label for="protein" class="form-label">Protein (g)</label>
+            <input type="number" step="0.1" class="form-control" id="protein" name="protein" required>
+          </div>
+          <div class="mb-3">
+            <label for="carb" class="form-label">Carb (g)</label>
+            <input type="number" step="0.1" class="form-control" id="carb" name="carb" required>
+          </div>
+          <div class="mb-3">
+            <label for="fats" class="form-label">Fats (g)</label>
+            <input type="number" step="0.1" class="form-control" id="fats" name="fats" required>
           </div>
           <button type="submit" class="btn btn-primary">Add Meal</button>
         </form>
         <hr>
-        <h2>Your Meals</h2>
-        <% if (meals.length > 0) { %>
-          <ul class="list-group">
+        <h2>All Meals</h2>
+        <table id="mealsTable" class="display">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Protein (g)</th>
+              <th>Carb (g)</th>
+              <th>Fats (g)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
             <% meals.forEach(meal => { %>
-              <li class="list-group-item">
-                <strong><%= meal.name %></strong> on <%= meal.date %>
-              </li>
+              <tr>
+                <td><%= meal.title %></td>
+                <td><%= meal.protein %></td>
+                <td><%= meal.carb %></td>
+                <td><%= meal.fats %></td>
+                <td>
+                  <button class="btn btn-sm btn-warning">Edit</button>
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+              </tr>
             <% }); %>
-          </ul>
-        <% } else { %>
-          <p>No meals yet.</p>
-        <% } %>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#mealsTable').DataTable();
+    });
+  </script>
 </body>
 </html>
