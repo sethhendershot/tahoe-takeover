@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Meals</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-light">
+  <%- include('menu') %>
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h1><i class="fas fa-calendar-alt"></i> Schedule Meals</h1>
+      </div>
+      <div class="card-body text-center">
+        <h3>Choose Your Day Type</h3>
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <a href="/training-day" class="btn btn-primary btn-lg w-100 mb-3">
+              <i class="fas fa-dumbbell"></i> Schedule Training Day
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a href="/not-training-day" class="btn btn-secondary btn-lg w-100 mb-3">
+              <i class="fas fa-couch"></i> Schedule Non-Training Day
+            </a>
+          </div>
+        </div>
+        <p class="text-muted mt-3">Select the type of day to plan your meals accordingly.</p>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

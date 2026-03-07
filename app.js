@@ -174,6 +174,11 @@ app.get('/meal-options', (req, res) => {
   }
 });
 
+app.get('/schedule-meals', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('schedule-meals');
+});
+
 app.post('/meal-options', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ success: false, message: 'Please log in first' });
