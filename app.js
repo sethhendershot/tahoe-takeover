@@ -95,6 +95,21 @@ app.post('/meals', (req, res) => {
   }
 });
 
+app.get('/training-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('training-day');
+});
+
+app.get('/not-training-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('not-training-day');
+});
+
+app.get('/check-in-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('check-in-day');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
