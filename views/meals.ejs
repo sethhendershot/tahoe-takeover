@@ -141,7 +141,7 @@
         };
         $.post('/meals', data, function(response) {
           $('#editMealModal').modal('hide');
-          location.reload();
+          //location.reload();
         }).fail(function() {
           alert('Error updating meal');
         });

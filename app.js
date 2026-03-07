@@ -66,7 +66,11 @@ app.post('/logout', (req, res) => {
 // Placeholder for meal planning routes
 app.get('/meals', (req, res) => {
   if (!req.session.user) {
-    return res.status(401).send('Please log in first');
+    if (req.accepts('html')) {
+      return res.redirect('/');
+    } else {
+      return res.status(401).send('Please log in first');
+    }
   }
   const data = readData();
   if (req.accepts('html')) {
@@ -78,7 +82,11 @@ app.get('/meals', (req, res) => {
 
 app.post('/meals', (req, res) => {
   if (!req.session.user) {
-    return res.status(401).send('Please log in first');
+    if (req.accepts('html')) {
+      return res.redirect('/');
+    } else {
+      return res.status(401).send('Please log in first');
+    }
   }
   if (req.body.action === 'update') {
     const { id, title, protein, carb, fats } = req.body;
