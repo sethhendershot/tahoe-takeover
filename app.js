@@ -77,6 +77,10 @@ app.post('/logout', (req, res) => {
   });
 });
 
+app.get('/meal-guide', (req, res) => {
+  res.render('meal-guide');
+});
+
 // Placeholder for meal planning routes
 app.get('/meals', (req, res) => {
   if (!req.session.user) {

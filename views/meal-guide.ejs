@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meal Guidance</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    h1 { font-family: 'Montserrat', sans-serif; }
+  </style>
+</head>
+<body class="bg-light">
+  <%- include('menu') %>
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h1><i class="fas fa-info-circle"></i> Meal Guidance</h1>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+      </div>
+      <div class="card-body">
+        <p>These are suggested macro values for different day types. Adjust based on your needs.</p>
+
+        <h2>Non-Training Day</h2>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 1</h4>
+            <p>P: 30g, C: 40g, F: 0g</p>
+          </div>
+          <div class="col-md-6">
+            <h4>Meal 2</h4>
+            <p>P: 30g, C: 30g, F: 0g</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 3</h4>
+            <p>P: 30g, C: 20g, F: 0g</p>
+          </div>
+          <div class="col-md-6">
+            <h4>Meal 4</h4>
+            <p>P: 30g, C: 0g, F: 7g</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 5</h4>
+            <p>P: 25g, C: 0g, F: 7g</p>
+          </div>
+        </div>
+
+        <h2>Training Day</h2>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 1</h4>
+            <p>P: 30g, C: 0g, F: 14g</p>
+          </div>
+          <div class="col-md-6">
+            <h4>Meal 2</h4>
+            <p>P: 30g, C: 45g, F: 0g</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 3</h4>
+            <p>P: 30g, C: 30g, F: 0g</p>
+          </div>
+          <div class="col-md-6">
+            <h4>Meal 4</h4>
+            <p>P: 25g, C: 30g, F: 0g</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Meal 5</h4>
+            <p>P: 25g, C: 20g, F: 0g</p>
+          </div>
+          <div class="col-md-6">
+            <h4>Meal 6</h4>
+            <p>P: 25g, C: 0g, F: 7g</p>
+          </div>
+        </div>
+
+        <h2>Check-in Day</h2>
+        <p>No specific guidance available yet. Follow training day suggestions or consult your coach.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html></content>
+<parameter name="filePath">c:\Users\seth\App Projects\Tahoe Takeover\views\meal-guide.ejs
