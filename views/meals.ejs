@@ -127,22 +127,16 @@
           if (response.success) {
             showToast(response.message, 'success');
             $(this).trigger('reset'); // Clear the form
-            // Add new row to table
-            const tbody = $('#mealsTable tbody');
+            // Add new row using DataTable API
+            const table = $('#mealsTable').DataTable();
             const meal = response.meal;
-            tbody.append(`
-              <tr>
-                <td>${meal.title}</td>
-                <td>${meal.protein}</td>
-                <td>${meal.carb}</td>
-                <td>${meal.fats}</td>
-                <td>
-                  <button class="btn btn-sm btn-warning edit-btn" data-id="${meal.id}" data-title="${meal.title}" data-protein="${meal.protein}" data-carb="${meal.carb}" data-fats="${meal.fats}">Edit</button>
-                  <button class="btn btn-sm btn-danger delete-btn" data-id="${meal.id}">Delete</button>
-                </td>
-              </tr>
-            `);
-            $('#mealsTable').DataTable().draw();
+            table.row.add([
+              meal.title,
+              meal.protein,
+              meal.carb,
+              meal.fats,
+              `<button class="btn btn-sm btn-warning edit-btn" data-id="${meal.id}" data-title="${meal.title}" data-protein="${meal.protein}" data-carb="${meal.carb}" data-fats="${meal.fats}">Edit</button> <button class="btn btn-sm btn-danger delete-btn" data-id="${meal.id}">Delete</button>`
+            ]).draw();
           } else {
             showToast(response.message, 'danger');
           }
@@ -157,15 +151,18 @@
           if (response.success) {
             showToast(response.message, 'success');
             $('#editMealModal').modal('hide');
-            // Update the row
+            // Update the row using DataTable API
+            const table = $('#mealsTable').DataTable();
             const meal = response.meal;
             const row = $(`#mealsTable tbody tr`).find(`.edit-btn[data-id="${meal.id}"]`).closest('tr');
-            row.find('td').eq(0).text(meal.title);
-            row.find('td').eq(1).text(meal.protein);
-            row.find('td').eq(2).text(meal.carb);
-            row.find('td').eq(3).text(meal.fats);
-            row.find('.edit-btn').data({ title: meal.title, protein: meal.protein, carb: meal.carb, fats: meal.fats });
-            $('#mealsTable').DataTable().draw();
+            const rowIndex = table.row(row).index();
+            table.row(rowIndex).data([
+              meal.title,
+              meal.protein,
+              meal.carb,
+              meal.fats,
+              `<button class="btn btn-sm btn-warning edit-btn" data-id="${meal.id}" data-title="${meal.title}" data-protein="${meal.protein}" data-carb="${meal.carb}" data-fats="${meal.fats}">Edit</button> <button class="btn btn-sm btn-danger delete-btn" data-id="${meal.id}">Delete</button>`
+            ]).draw();
           } else {
             showToast(response.message, 'danger');
           }
@@ -193,9 +190,10 @@
           $.post('/meals', { id, action: 'delete' }, function(response) {
             if (response.success) {
               showToast(response.message, 'success');
-              // Remove the row
-              $(this).closest('tr').remove();
-              $('#mealsTable').DataTable().draw();
+              // Remove the row using DataTable API
+              const table = $('#mealsTable').DataTable();
+              const row = $(this).closest('tr');
+              table.row(row).remove().draw();
             } else {
               showToast(response.message, 'danger');
             }
