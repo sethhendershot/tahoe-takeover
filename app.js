@@ -157,7 +157,8 @@ app.get('/not-training-day', (req, res) => {
 
 app.get('/check-in-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  res.render('check-in-day');
+  const data = readData();
+  res.render('check-in-day', { meals: data.meals });
 });
 
 app.post('/training-day', (req, res) => {
@@ -180,9 +181,9 @@ app.post('/training-day', (req, res) => {
   for (let i = 1; i <= 6; i++) {
     dayPlan.meals.push({
       slot: i,
-      protein: { amount: parseFloat(req.body['protein' + i]), mealId: req.body['proteinMeal' + i] },
-      carbs: { amount: parseFloat(req.body['carbs' + i]), mealId: req.body['carbsMeal' + i] },
-      fats: { amount: parseFloat(req.body['fats' + i]), mealId: req.body['fatsMeal' + i] }
+      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
+      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
+      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
     });
   }
   writeData(data);
@@ -202,12 +203,41 @@ app.post('/not-training-day', (req, res) => {
   for (let i = 1; i <= 5; i++) {
     dayPlan.meals.push({
       slot: i,
-      protein: { amount: parseFloat(req.body['protein' + i]), mealId: req.body['proteinMeal' + i] },
-      carbs: { amount: parseFloat(req.body['carbs' + i]), mealId: req.body['carbsMeal' + i] },
-      fats: { amount: parseFloat(req.body['fats' + i]), mealId: req.body['fatsMeal' + i] }
+      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
+      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
+      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
     });
   }
   data.dayPlans.push(dayPlan);
+  writeData(data);
+  res.redirect('/day-plans');
+});
+
+app.post('/check-in-day', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  const data = readData();
+  const date = req.body.date || new Date().toISOString().split('T')[0];
+  let dayPlan = data.dayPlans.find(p => p.date === date && p.type === 'check-in' && p.user === req.session.user);
+  if (!dayPlan) {
+    dayPlan = {
+      id: Date.now(),
+      date,
+      type: 'check-in',
+      user: req.session.user,
+      meals: []
+    };
+    data.dayPlans.push(dayPlan);
+  } else {
+    dayPlan.meals = []; // reset
+  }
+  for (let i = 1; i <= 6; i++) {
+    dayPlan.meals.push({
+      slot: i,
+      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
+      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
+      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
+    });
+  }
   writeData(data);
   res.redirect('/day-plans');
 });
