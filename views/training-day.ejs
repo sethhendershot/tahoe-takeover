@@ -24,7 +24,6 @@
           <label for="date" class="form-label">Select Date</label>
           <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
         </form>
-        <button id="toggleGuidance" class="btn btn-outline-primary mb-3">Show Guidance</button>
         <form action="/training-day" method="POST">
           <input type="hidden" name="date" value="<%= selectedDate %>">
           <% for (let i = 1; i <= 6; i++) { %>
@@ -35,7 +34,7 @@
                   <label class="form-label">Protein (g)</label>
                   <input type="number" step="1" class="form-control" id="protein<%= i %>" name="protein<%= i %>" value="">
                   <% const mealGuide = (locals.guide || []).find(m => m.meal === i); %>
-                  <span class="guidance text-muted small" style="display:none;">Suggested: <%= mealGuide ? mealGuide.protein + 'g' : 'N/A' %></span>
+                  <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.protein + 'g' : 'N/A' %></span>
                   <select class="form-select mt-1" id="proteinMeal<%= i %>" name="proteinMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.protein > 0).forEach(meal => { %>
@@ -46,7 +45,7 @@
                 <div class="col-md-4">
                   <label class="form-label">Carbs (g)</label>
                   <input type="number" step="1" class="form-control" id="carbs<%= i %>" name="carbs<%= i %>" value="">
-                  <span class="guidance text-muted small" style="display:none;">Suggested: <%= mealGuide ? mealGuide.carb + 'g' : 'N/A' %></span>
+                  <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.carb + 'g' : 'N/A' %></span>
                   <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.carb > 0).forEach(meal => { %>
@@ -57,7 +56,7 @@
                 <div class="col-md-4">
                   <label class="form-label">Fats (g)</label>
                   <input type="number" step="1" class="form-control" id="fats<%= i %>" name="fats<%= i %>" value="">
-                  <span class="guidance text-muted small" style="display:none;">Suggested: <%= mealGuide ? mealGuide.fats + 'g' : 'N/A' %></span>
+                  <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.fats + 'g' : 'N/A' %></span>
                   <select class="form-select mt-1" id="fatsMeal<%= i %>" name="fatsMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.fats > 0).forEach(meal => { %>
@@ -129,15 +128,6 @@
         });
       }
 
-      // Toggle guidance
-      document.getElementById('toggleGuidance').addEventListener('click', function() {
-        const guidanceElements = document.querySelectorAll('.guidance');
-        const isVisible = Array.from(guidanceElements).some(el => el.style.display !== 'none');
-        guidanceElements.forEach(el => {
-          el.style.display = isVisible ? 'none' : 'inline';
-        });
-        this.textContent = isVisible ? 'Show Guidance' : 'Hide Guidance';
-      });
     });
 
     function filterSelect(macro, mealNum) {

@@ -5,7 +5,8 @@ h1 {
 }
 
 .dropdown-menu {
-  z-index: 1050;
+  z-index: 9999;
+  position: absolute;
 }
 
 /* Additional common styles can be added here */
