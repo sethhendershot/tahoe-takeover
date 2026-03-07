@@ -420,7 +420,14 @@ app.post('/update-amount', (req, res) => {
 
 app.get('/check-ins', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  res.render('check-ins', { user: req.session.user });
+  const mealsData = readMeals();
+  const checkInsData = {};
+  Object.keys(mealsData).forEach(date => {
+    if (mealsData[date].type === 'check-in') {
+      checkInsData[date] = mealsData[date];
+    }
+  });
+  res.render('check-ins', { checkInsData, user: req.session.user });
 });
 
 app.get('/statistics', (req, res) => {
