@@ -69,7 +69,11 @@ app.get('/meals', (req, res) => {
     return res.status(401).send('Please log in first');
   }
   const data = readData();
-  res.json(data.meals);
+  if (req.accepts('html')) {
+    res.render('meals', { meals: data.meals });
+  } else {
+    res.json(data.meals);
+  }
 });
 
 app.post('/meals', (req, res) => {
@@ -84,7 +88,11 @@ app.post('/meals', (req, res) => {
   const meal = { id: Date.now(), ...newMeal };
   data.meals.push(meal);
   writeData(data);
-  res.json({ message: 'Meal added', meal });
+  if (req.accepts('html')) {
+    res.redirect('/meals');
+  } else {
+    res.json({ message: 'Meal added', meal });
+  }
 });
 
 const PORT = process.env.PORT || 3000;

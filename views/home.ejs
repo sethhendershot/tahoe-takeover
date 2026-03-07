@@ -12,7 +12,11 @@
       <div class="card">
         <div class="card-body">
           <h1 class="card-title">Welcome, <%= user %>!</h1>
-          <a href="/meals" class="btn btn-primary">View Meals</a>
+          <p class="card-text">Select your day type for meal planning:</p>
+          <a href="/meals?day=training" class="btn btn-success me-2">Training Day</a>
+          <a href="/meals?day=not-training" class="btn btn-warning">Not Training Day</a>
+          <br><br>
+          <a href="/meals" class="btn btn-primary me-2">View All Meals</a>
           <form action="/logout" method="POST" class="d-inline">
             <button type="submit" class="btn btn-secondary">Logout</button>
           </form>
