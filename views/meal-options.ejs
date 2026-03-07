@@ -132,6 +132,7 @@
             showToast(response.message, 'success');
             $(this).trigger('reset'); // Clear the form
             $('#addMealModal').modal('hide'); // Close the modal
+            $('.modal-backdrop').remove(); // Remove backdrop if it persists
             // Add new row using DataTable API
             const table = $('#mealsTable').DataTable();
             const meal = response.meal;
