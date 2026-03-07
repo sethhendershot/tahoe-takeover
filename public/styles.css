@@ -1,0 +1,11 @@
+/* Common styles for the Tahoe Takeover meal planning app */
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.dropdown-menu {
+  z-index: 1050;
+}
+
+/* Additional common styles can be added here */
