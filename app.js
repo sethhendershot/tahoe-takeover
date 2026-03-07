@@ -152,13 +152,17 @@ app.get('/training-day', (req, res) => {
 app.get('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
-  res.render('not-training-day', { meals: data.meals });
+  const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
+  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'not-training' && p.user === req.session.user) || null;
+  res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
 app.get('/check-in-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
-  res.render('check-in-day', { meals: data.meals });
+  const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
+  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'check-in' && p.user === req.session.user) || null;
+  res.render('check-in-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
 app.post('/training-day', (req, res) => {
