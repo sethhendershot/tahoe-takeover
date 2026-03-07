@@ -111,6 +111,27 @@
       "protein": 25,
       "carb": 0,
       "fats": 0
+    },
+    {
+      "id": 1772890705555,
+      "title": "protein powder = properly measured 25g",
+      "protein": 25,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772890731122,
+      "title": "protein powder = properly measured",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772890756076,
+      "title": "protein powder = properly measured2",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
     }
   ],
   "dayPlans": []

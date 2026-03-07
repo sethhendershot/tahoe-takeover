@@ -86,7 +86,7 @@ app.post('/meals', (req, res) => {
       return res.status(400).send('All fields required');
     }
     const data = readData();
-    data.meals = data.meals.map(m => m.id == id ? { ...m, title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) } : m);
+    data.meals = data.meals.map(m => m.id === parseInt(id) ? { ...m, title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) } : m);
     writeData(data);
   } else {
     const { title, protein, carb, fats } = req.body;
