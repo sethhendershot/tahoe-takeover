@@ -203,13 +203,13 @@
         $('#add-training').click(() => openModal('add', 'training'));
         $('#add-check-in').click(() => openModal('add', 'check-in'));
 
-        $('.edit-btn').click(function() {
+        $(document).on('click', '.edit-btn', function() {
           const day = $(this).data('day');
           const meal = $(this).data('meal');
           openModal('edit', day, meal);
         });
 
-        $('.delete-btn').click(function() {
+        $(document).on('click', '.delete-btn', function() {
           const day = $(this).data('day');
           const meal = $(this).data('meal');
           if (confirm('Are you sure you want to delete this meal?')) {
@@ -250,11 +250,24 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
-          }).then(res => res.json()).then(data => {
-            if (data.success) {
-              location.reload();
+          }).then(res => res.json()).then(response => {
+            if (response.success) {
+              $('#mealModal').modal('hide');
+              const tableId = `${data.dayType}-table`;
+              const table = $('#' + tableId).DataTable();
+              const actions = '<button class="btn btn-sm btn-warning edit-btn" data-day="' + data.dayType + '" data-meal="' + data.meal + '" data-protein="' + data.protein + '" data-carb="' + data.carb + '" data-fats="' + data.fats + '" data-note="' + data.note + '">Edit</button> <button class="btn btn-sm btn-danger delete-btn" data-day="' + data.dayType + '" data-meal="' + data.meal + '">Delete</button>';
+              const newRow = [data.meal, data.protein, data.carb, data.fats, data.note, actions];
+              if (data.action === 'add') {
+                table.row.add(newRow).draw();
+              } else if (data.action === 'edit') {
+                table.rows().every(function() {
+                  if (this.data()[0] == data.id) {
+                    this.data(newRow).draw();
+                  }
+                });
+              }
             } else {
-              alert('Error: ' + data.message);
+              alert('Error: ' + response.message);
             }
           });
         });
@@ -266,7 +279,13 @@
             body: JSON.stringify({ action: 'delete', dayType, id: mealId })
           }).then(res => res.json()).then(data => {
             if (data.success) {
-              location.reload();
+              const tableId = `${dayType}-table`;
+              const table = $('#' + tableId).DataTable();
+              table.rows().every(function() {
+                if (this.data()[0] == mealId) {
+                  this.remove().draw();
+                }
+              });
             } else {
               alert('Error: ' + data.message);
             }
