@@ -104,7 +104,7 @@
               <label for="editFats" class="form-label">Fats (g)</label>
               <input type="number" step="0.1" class="form-control" id="editFats" name="fats" required>
             </div>
-            <button type="submit" class="btn btn-primary">Update Meal</button>
+            <button type="submit" class="btn btn-primary" id="saveMeal">Update Meal</button>
           </form>
         </div>
       </div>
@@ -128,6 +128,23 @@
         $('#editCarb').val(carb);
         $('#editFats').val(fats);
         $('#editMealModal').modal('show');
+      });
+      $('#saveMeal').on('click', function(e) {
+        e.preventDefault();
+        const data = {
+          id: $('#editMealId').val(),
+          title: $('#editTitle').val(),
+          protein: $('#editProtein').val(),
+          carb: $('#editCarb').val(),
+          fats: $('#editFats').val(),
+          action: 'update'
+        };
+        $.post('/meals', data, function(response) {
+          $('#editMealModal').modal('hide');
+          location.reload();
+        }).fail(function() {
+          alert('Error updating meal');
+        });
       });
     });
   </script>
