@@ -25,13 +25,16 @@
         <a href="/" class="btn btn-secondary">Back to Home</a>
       </div>
       <div class="card-body">
+        <% let selectedDate = locals.selectedDate || new Date().toISOString().split('T')[0]; %>
+        <% let dayPlan = locals.dayPlan; %>
+        <% let meals = locals.meals || []; %>
         <form action="/training-day" method="GET" class="mb-3">
           <label for="date" class="form-label">Select Date</label>
-          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate || new Date().toISOString().split('T')[0] %>">
+          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>">
           <button type="submit" class="btn btn-secondary mt-2">Load Date</button>
         </form>
         <form action="/training-day" method="POST">
-          <input type="hidden" name="date" value="<%= selectedDate || new Date().toISOString().split('T')[0] %>">
+          <input type="hidden" name="date" value="<%= selectedDate %>">
           <% for (let i = 1; i <= 6; i++) { %>
             <div class="mb-4">
               <h5>Meal <%= i %></h5>
