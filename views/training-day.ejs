@@ -48,7 +48,7 @@
                   <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.carb > 0).forEach(meal => { %>
-                      <option value="<%= meal.id %>" data-carb="<%= meal.carb %>"><%= meal.title %> (C: <%= meal.carb %>g)</option>
+                      <option value="<%= meal.id %>" data-carbs="<%= meal.carb %>"><%= meal.title %> (C: <%= meal.carb %>g)</option>
                     <% }); %>
                   </select>
                 </div>
