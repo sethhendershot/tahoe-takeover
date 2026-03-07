@@ -124,21 +124,31 @@
       $('#addMealForm').on('submit', function(e) {
         e.preventDefault();
         $.post('/meals', $(this).serialize(), function(response) {
-          showToast(response.message, 'success');
-          $(this).trigger('reset'); // Clear the form
-          updateTable();
+          if (response.success) {
+            showToast(response.message, 'success');
+            $(this).trigger('reset'); // Clear the form
+            updateTable();
+          } else {
+            showToast(response.message, 'danger');
+          }
         }.bind(this)).fail(function(xhr) {
-          showToast('Error adding meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+          const message = xhr.responseJSON?.message || xhr.statusText;
+          showToast('Error: ' + message, 'danger');
         });
       });
       $('#editMealForm').on('submit', function(e) {
         e.preventDefault();
         $.post('/meals', $(this).serialize(), function(response) {
-          showToast(response.message, 'success');
-          $('#editMealModal').modal('hide');
-          updateTable();
+          if (response.success) {
+            showToast(response.message, 'success');
+            $('#editMealModal').modal('hide');
+            updateTable();
+          } else {
+            showToast(response.message, 'danger');
+          }
         }).fail(function(xhr) {
-          showToast('Error updating meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+          const message = xhr.responseJSON?.message || xhr.statusText;
+          showToast('Error: ' + message, 'danger');
         });
       });
       $('#mealsTable').on('click', '.edit-btn', function() {
@@ -158,10 +168,15 @@
         const id = $(this).data('id');
         if (confirm('Are you sure you want to delete this meal?')) {
           $.post('/meals', { id, action: 'delete' }, function(response) {
-            showToast(response.message, 'success');
-            updateTable();
+            if (response.success) {
+              showToast(response.message, 'success');
+              updateTable();
+            } else {
+              showToast(response.message, 'danger');
+            }
           }).fail(function(xhr) {
-            showToast('Error deleting meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+            const message = xhr.responseJSON?.message || xhr.statusText;
+            showToast('Error: ' + message, 'danger');
           });
         }
       });

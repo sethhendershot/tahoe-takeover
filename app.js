@@ -82,49 +82,48 @@ app.get('/meals', (req, res) => {
 
 app.post('/meals', (req, res) => {
   if (!req.session.user) {
-    if (req.accepts('html')) {
-      return res.redirect('/');
-    } else {
-      return res.status(401).json({ message: 'Please log in first' });
-    }
+    return res.status(401).json({ success: false, message: 'Please log in first' });
   }
-  if (req.body.action === 'delete') {
-    const { id } = req.body;
+  const { action, id, title, protein, carb, fats } = req.body;
+  const data = readData();
+  if (action === 'delete') {
     if (!id) {
-      return res.status(400).json({ message: 'ID required' });
+      return res.status(400).json({ success: false, message: 'ID required for delete' });
     }
-    const data = readData();
-    data.meals = data.meals.filter(m => m.id !== parseInt(id));
+    const index = data.meals.findIndex(m => m.id === parseInt(id));
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: 'Meal not found' });
+    }
+    data.meals.splice(index, 1);
     writeData(data);
-    if (req.accepts('html')) {
-      res.redirect('/meals');
-    } else {
-      res.json({ message: 'Meal deleted successfully!' });
-    }
+    return res.json({ success: true, message: 'Meal deleted successfully' });
   } else {
-    const { id, title, protein, carb, fats } = req.body;
+    // add or update
     if (!title || protein == null || carb == null || fats == null) {
-      return res.status(400).json({ message: 'All fields required' });
+      return res.status(400).json({ success: false, message: 'All fields required' });
     }
-    const data = readData();
+    let meal;
     if (id) {
-      // Update if exists, or create new with given id
       const existingIndex = data.meals.findIndex(m => m.id === parseInt(id));
       if (existingIndex !== -1) {
-        data.meals[existingIndex] = { ...data.meals[existingIndex], title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+        // update
+        meal = { ...data.meals[existingIndex], title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+        data.meals[existingIndex] = meal;
+        writeData(data);
+        return res.json({ success: true, message: 'Meal updated successfully', meal });
       } else {
-        data.meals.push({ id: parseInt(id), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) });
+        // create with given id (though unlikely)
+        meal = { id: parseInt(id), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+        data.meals.push(meal);
+        writeData(data);
+        return res.json({ success: true, message: 'Meal created successfully', meal });
       }
     } else {
-      // Create new meal
-      const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+      // create new
+      meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
       data.meals.push(meal);
-    }
-    writeData(data);
-    if (req.accepts('html')) {
-      res.redirect('/meals');
-    } else {
-      res.json({ message: id ? 'Meal updated or added successfully!' : 'New meal added to your list!' });
+      writeData(data);
+      return res.json({ success: true, message: 'Meal added successfully', meal });
     }
   }
 });
