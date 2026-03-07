@@ -2,8 +2,16 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="/"><i class="fas fa-list"></i> Prep Planner</a>
       <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/meals">View All Meals</a>
-        <a class="nav-link" href="/day-plans">View Day Plans</a>
+        <div class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle btn" type="button" id="mealsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Meals
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="mealsDropdown">
+            <li><a class="dropdown-item" href="/meals">Options</a></li>
+            <li><a class="dropdown-item" href="/meal-guide">Guidance</a></li>
+            <li><a class="dropdown-item" href="/meals-list">View All</a></li>
+          </ul>
+        </div>
         <form class="d-inline" action="/logout" method="POST">
           <button class="btn btn-link nav-link" type="submit">Logout</button>
         </form>
