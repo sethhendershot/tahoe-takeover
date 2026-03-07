@@ -18,29 +18,25 @@
       </div>
       <div class="card-body">
         <% Object.keys(mealsData).forEach(date => { %>
-          <h2 class="mt-4">Date: <%= date %></h2>
-          <p><strong>Type:</strong> <%= mealsData[date].type %></p>
-          <p><strong>User:</strong> <%= mealsData[date].user %></p>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Meal #</th>
-                <th>Protein (g)</th>
-                <th>Carbs (g)</th>
-                <th>Fats (g)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% Object.keys(mealsData[date].meals).forEach(mealNum => { %>
-                <tr>
-                  <td><%= mealNum %></td>
-                  <td><%= mealsData[date].meals[mealNum].protein %></td>
-                  <td><%= mealsData[date].meals[mealNum].carbs %></td>
-                  <td><%= mealsData[date].meals[mealNum].fats %></td>
-                </tr>
-              <% }); %>
-            </tbody>
-          </table>
+          <% 
+            let totalProtein = 0, totalCarbs = 0, totalFats = 0;
+            Object.values(mealsData[date].meals).forEach(meal => {
+              totalProtein += meal.protein || 0;
+              totalCarbs += meal.carbs || 0;
+              totalFats += meal.fats || 0;
+            });
+            let typeRoute = mealsData[date].type === 'training' ? 'training-day' : 
+                            mealsData[date].type === 'not-training' ? 'not-training-day' : 'check-in-day';
+          %>
+          <div class="border p-3 mb-3 rounded">
+            <h3>Date: <%= date %></h3>
+            <p><strong>Type:</strong> <%= mealsData[date].type %></p>
+            <p><strong>User:</strong> <%= mealsData[date].user %></p>
+            <p><strong>Total Protein:</strong> <%= totalProtein %>g</p>
+            <p><strong>Total Carbs:</strong> <%= totalCarbs %>g</p>
+            <p><strong>Total Fats:</strong> <%= totalFats %>g</p>
+            <a href="/<%= typeRoute %>?date=<%= date %>" class="btn btn-primary">View Meals</a>
+          </div>
         <% }); %>
       </div>
     </div>
