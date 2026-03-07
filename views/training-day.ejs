@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <style>
+    .logged { background-color: #d4edda !important; }
+  </style>
 </head>
 <body class="bg-light">
   <%- include('menu') %>
@@ -23,18 +26,20 @@
           <label for="date" class="form-label">Select Date</label>
           <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
         </form>
-        <form action="/training-day" method="POST">
-          <input type="hidden" name="date" value="<%= selectedDate %>">
-          <% for (let i = 1; i <= 6; i++) { %>
-            <div class="mb-4 border p-3 rounded">
-              <h5>Meal <%= i %></h5>
+        <% for (let i = 1; i <= 6; i++) { %>
+          <form class="meal-form" data-meal="<%= i %>">
+            <input type="hidden" name="date" value="<%= selectedDate %>">
+            <input type="hidden" name="meal" value="<%= i %>">
+            <input type="hidden" name="action" value="log" id="action<%= i %>">
+            <div class="mb-4 border p-3 rounded" id="mealDiv<%= i %>">
+              <h5 id="mealHeader<%= i %>">Meal <%= i %> <span class="badge" id="status<%= i %>">Not Logged</span></h5>
               <div class="row">
                 <div class="col-md-4">
                   <label class="form-label">Protein (g)</label>
-                  <input type="number" step="1" class="form-control" id="protein<%= i %>" name="protein<%= i %>" value="">
+                  <input type="number" step="1" class="form-control" id="protein<%= i %>" name="protein" value="">
                   <% const mealGuide = (locals.guide || []).find(m => m.meal === i); %>
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.protein + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="proteinMeal<%= i %>" name="proteinMeal<%= i %>">
+                  <select class="form-select mt-1" id="proteinMeal<%= i %>" name="proteinMealId">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.protein > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-protein="<%= meal.protein %>"><%= meal.title %> (P: <%= meal.protein %>g)</option>
@@ -43,9 +48,9 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Carbs (g)</label>
-                  <input type="number" step="1" class="form-control" id="carbs<%= i %>" name="carbs<%= i %>" value="">
+                  <input type="number" step="1" class="form-control" id="carbs<%= i %>" name="carbs" value="">
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.carb + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMeal<%= i %>">
+                  <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMealId">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.carb > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-carbs="<%= meal.carb %>"><%= meal.title %> (C: <%= meal.carb %>g)</option>
@@ -54,9 +59,9 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Fats (g)</label>
-                  <input type="number" step="1" class="form-control" id="fats<%= i %>" name="fats<%= i %>" value="">
+                  <input type="number" step="1" class="form-control" id="fats<%= i %>" name="fats" value="">
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.fats + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="fatsMeal<%= i %>" name="fatsMeal<%= i %>">
+                  <select class="form-select mt-1" id="fatsMeal<%= i %>" name="fatsMealId">
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.fats > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-fats="<%= meal.fats %>"><%= meal.title %> (F: <%= meal.fats %>g)</option>
@@ -64,10 +69,10 @@
                   </select>
                 </div>
               </div>
+              <button type="submit" class="btn btn-primary mt-2" id="logBtn<%= i %>">Log Meal</button>
             </div>
-          <% } %>
-          <button type="submit" class="btn btn-primary">Save Training Day</button>
-        </form>
+          </form>
+        <% } %>
       </div>
     </div>
   </div>
@@ -75,25 +80,66 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const selectedDate = '<%= selectedDate %>';
-      // Load meals for the date
-      fetch(`/load-meals?date=${selectedDate}`)
-        .then(res => res.json())
-        .then(data => {
-          for (let i = 1; i <= 6; i++) {
-            const mealData = data[i] || {};
-            document.getElementById(`protein${i}`).value = mealData.protein || '';
-            document.getElementById(`carbs${i}`).value = mealData.carbs || '';
-            document.getElementById(`fats${i}`).value = mealData.fats || '';
-            document.getElementById(`proteinMeal${i}`).value = mealData.proteinMealId || '';
-            document.getElementById(`carbsMeal${i}`).value = mealData.carbsMealId || '';
-            document.getElementById(`fatsMeal${i}`).value = mealData.fatsMealId || '';
-            // filter selects
-            filterSelect('protein', i);
-            filterSelect('carbs', i);
-            filterSelect('fats', i);
-          }
+      loadMeals();
+
+      function loadMeals() {
+        fetch(`/load-meals?date=${selectedDate}`)
+          .then(res => res.json())
+          .then(data => {
+            for (let i = 1; i <= 6; i++) {
+              const mealData = data[i] || {};
+              document.getElementById(`protein${i}`).value = mealData.protein || '';
+              document.getElementById(`carbs${i}`).value = mealData.carbs || '';
+              document.getElementById(`fats${i}`).value = mealData.fats || '';
+              document.getElementById(`proteinMeal${i}`).value = mealData.proteinMealId || '';
+              document.getElementById(`carbsMeal${i}`).value = mealData.carbsMealId || '';
+              document.getElementById(`fatsMeal${i}`).value = mealData.fatsMealId || '';
+              updateStatus(i, mealData);
+              filterSelect('protein', i);
+              filterSelect('carbs', i);
+              filterSelect('fats', i);
+            }
+          });
+      }
+
+      function updateStatus(mealNum, mealData) {
+        const isLogged = (mealData.protein > 0 || mealData.carbs > 0 || mealData.fats > 0);
+        const statusEl = document.getElementById(`status${mealNum}`);
+        const btnEl = document.getElementById(`logBtn${mealNum}`);
+        const actionEl = document.getElementById(`action${mealNum}`);
+        const divEl = document.getElementById(`mealDiv${mealNum}`);
+        if (isLogged) {
+          statusEl.textContent = 'Logged';
+          statusEl.className = 'badge bg-success';
+          btnEl.textContent = 'Un-log Meal';
+          btnEl.className = 'btn btn-danger mt-2';
+          actionEl.value = 'unlog';
+          divEl.classList.add('logged');
+        } else {
+          statusEl.textContent = 'Not Logged';
+          statusEl.className = 'badge bg-secondary';
+          btnEl.textContent = 'Log Meal';
+          btnEl.className = 'btn btn-primary mt-2';
+          actionEl.value = 'log';
+          divEl.classList.remove('logged');
+        }
+      }
+
+      // Form submit
+      document.querySelectorAll('.meal-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          fetch('/training-day', {
+            method: 'POST',
+            body: formData
+          }).then(res => res.json()).then(() => {
+            loadMeals();
+          });
         });
-      // On select change, update mealId
+      });
+
+      // On select change, update input
       for (let i = 1; i <= 6; i++) {
         ['protein', 'carbs', 'fats'].forEach(macro => {
           document.getElementById(`${macro}Meal${i}`).addEventListener('change', function() {
@@ -103,26 +149,6 @@
               const mealValue = selectedOption.dataset[macro];
               document.getElementById(`${macro}${i}`).value = mealValue;
             }
-            fetch('/update-meal', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ date: selectedDate, mealNum: i, macro, mealId })
-            });
-          });
-        });
-      }
-      // On input change, update amount and filter
-      for (let i = 1; i <= 6; i++) {
-        ['protein', 'carbs', 'fats'].forEach(macro => {
-          document.getElementById(`${macro}${i}`).addEventListener('change', function() {
-            const amount = this.value;
-            fetch('/update-amount', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ date: selectedDate, mealNum: i, macro, amount: parseFloat(amount) || 0 })
-            }).then(() => {
-              filterSelect(macro, i);
-            });
           });
         });
       }

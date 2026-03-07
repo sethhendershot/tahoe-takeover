@@ -272,10 +272,18 @@ app.get('/check-in-day', (req, res) => {
   res.render('check-in-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
+app.get('/load-meals', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const mealsData = readMeals();
+  const date = req.query.date;
+  if (!mealsData[date]) return res.json({});
+  res.json(mealsData[date].meals || {});
+});
+
 app.post('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const mealsData = readMeals();
-  const date = req.body.date || new Date().toISOString().split('T')[0];
+  const { date, meal, action, protein, carbs, fats, proteinMealId, carbsMealId, fatsMealId } = req.body;
   if (!mealsData[date]) {
     mealsData[date] = { type: 'training', user: req.session.user, meals: {} };
   } else if (!mealsData[date].meals) {
@@ -283,18 +291,28 @@ app.post('/training-day', (req, res) => {
   }
   mealsData[date].type = 'training';
   mealsData[date].user = req.session.user;
-  for (let i = 1; i <= 6; i++) {
-    mealsData[date].meals[i] = {
-      protein: parseFloat(req.body['protein' + i]) || 0,
-      carbs: parseFloat(req.body['carbs' + i]) || 0,
-      fats: parseFloat(req.body['fats' + i]) || 0,
-      proteinMealId: req.body['proteinMeal' + i],
-      carbsMealId: req.body['carbsMeal' + i],
-      fatsMealId: req.body['fatsMeal' + i]
+  const mealNum = parseInt(meal);
+  if (action === 'unlog') {
+    mealsData[date].meals[mealNum] = {
+      protein: 0,
+      carbs: 0,
+      fats: 0,
+      proteinMealId: '',
+      carbsMealId: '',
+      fatsMealId: ''
+    };
+  } else {
+    mealsData[date].meals[mealNum] = {
+      protein: parseFloat(protein) || 0,
+      carbs: parseFloat(carbs) || 0,
+      fats: parseFloat(fats) || 0,
+      proteinMealId: proteinMealId || '',
+      carbsMealId: carbsMealId || '',
+      fatsMealId: fatsMealId || ''
     };
   }
   writeMeals(mealsData);
-  res.redirect('/day-plans');
+  res.json({ success: true });
 });
 
 app.post('/not-training-day', (req, res) => {
