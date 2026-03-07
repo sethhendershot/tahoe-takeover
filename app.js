@@ -109,7 +109,8 @@ app.post('/meals', (req, res) => {
   if (req.accepts('html')) {
     res.redirect('/meals');
   } else {
-    res.json({ message: 'Meal updated or added' });
+    const message = req.body.action === 'update' ? 'Meal updated successfully' : 'Meal added successfully';
+    res.json({ message });
   }
 });
 
