@@ -8,6 +8,7 @@ const app = express();
 app.set('view engine', 'ejs');
 const dataPath = path.join(__dirname, 'meal-options.json');
 const mealsPath = path.join(__dirname, 'meals.json');
+const guidePath = path.join(__dirname, 'meal-guide.json');
 
 // Helper functions
 function readData() {
@@ -34,6 +35,19 @@ function readMeals() {
 
 function writeMeals(data) {
   fs.writeFileSync(mealsPath, JSON.stringify(data, null, 2));
+}
+
+function readGuide() {
+  try {
+    const data = fs.readFileSync(guidePath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return { "non-training": [], "training": [], "check-in": [] };
+  }
+}
+
+function writeGuide(data) {
+  fs.writeFileSync(guidePath, JSON.stringify(data, null, 2));
 }
 
 // Middleware
@@ -78,7 +92,42 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/meal-guide', (req, res) => {
-  res.render('meal-guide');
+  if (!req.session.user) return res.redirect('/');
+  const guide = readGuide();
+  res.render('meal-guide', { guide, isAdmin: req.session.isAdmin });
+});
+
+app.post('/meal-guide', (req, res) => {
+  if (!req.session.isAdmin) return res.status(403).json({ success: false, message: 'Admin access required' });
+  const { action, dayType, meal, protein, carb, fats, id } = req.body;
+  const guide = readGuide();
+  if (!guide[dayType]) guide[dayType] = [];
+  if (action === 'add') {
+    const newMeal = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+    guide[dayType].push(newMeal);
+    writeGuide(guide);
+    res.json({ success: true });
+  } else if (action === 'edit') {
+    const index = guide[dayType].findIndex(m => m.meal === parseInt(id));
+    if (index !== -1) {
+      guide[dayType][index] = { meal: parseInt(meal), protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+      writeGuide(guide);
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: 'Meal not found' });
+    }
+  } else if (action === 'delete') {
+    const index = guide[dayType].findIndex(m => m.meal === parseInt(id));
+    if (index !== -1) {
+      guide[dayType].splice(index, 1);
+      writeGuide(guide);
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: 'Meal not found' });
+    }
+  } else {
+    res.status(400).json({ success: false, message: 'Invalid action' });
+  }
 });
 
 // Placeholder for meal planning routes
