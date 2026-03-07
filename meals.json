@@ -3,10 +3,10 @@
     "1": "1772890705555",
     "meals": {
       "1": {
-        "protein": 0,
+        "protein": 25,
         "carbs": 45,
         "fats": 0,
-        "proteinMealId": "",
+        "proteinMealId": "1772889763274",
         "carbsMealId": "1772906238361",
         "fatsMealId": ""
       },

@@ -212,7 +212,7 @@ app.get('/training-day', (req, res) => {
       });
     }
   }
-  res.render('training-day', { meals: data.meals, dayPlan, selectedDate });
+  res.render('training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide().training });
 });
 
 app.get('/not-training-day', (req, res) => {
@@ -232,7 +232,7 @@ app.get('/not-training-day', (req, res) => {
       });
     }
   }
-  res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate });
+  res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide()['non-training'] });
 });
 
 app.get('/check-in-day', (req, res) => {
