@@ -80,18 +80,28 @@ app.post('/meals', (req, res) => {
   if (!req.session.user) {
     return res.status(401).send('Please log in first');
   }
-  const { title, protein, carb, fats } = req.body;
-  if (!title || protein == null || carb == null || fats == null) {
-    return res.status(400).send('All fields required');
+  if (req.body.action === 'update') {
+    const { id, title, protein, carb, fats } = req.body;
+    if (!id || !title || protein == null || carb == null || fats == null) {
+      return res.status(400).send('All fields required');
+    }
+    const data = readData();
+    data.meals = data.meals.map(m => m.id == id ? { ...m, title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) } : m);
+    writeData(data);
+  } else {
+    const { title, protein, carb, fats } = req.body;
+    if (!title || protein == null || carb == null || fats == null) {
+      return res.status(400).send('All fields required');
+    }
+    const data = readData();
+    const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+    data.meals.push(meal);
+    writeData(data);
   }
-  const data = readData();
-  const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
-  data.meals.push(meal);
-  writeData(data);
   if (req.accepts('html')) {
     res.redirect('/meals');
   } else {
-    res.json({ message: 'Meal added', meal });
+    res.json({ message: 'Meal updated or added' });
   }
 });
 

@@ -66,13 +66,47 @@
                 <td><%= meal.carb %></td>
                 <td><%= meal.fats %></td>
                 <td>
-                  <button class="btn btn-sm btn-warning">Edit</button>
-                  <button class="btn btn-sm btn-danger">Delete</button>
-                </td>
+                <button class="btn btn-sm btn-warning edit-btn" data-id="<%= meal.id %>" data-title="<%= meal.title %>" data-protein="<%= meal.protein %>" data-carb="<%= meal.carb %>" data-fats="<%= meal.fats %>">Edit</button>
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </td>
               </tr>
             <% }); %>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+  <!-- Edit Meal Modal -->
+  <div class="modal fade" id="editMealModal" tabindex="-1" aria-labelledby="editMealModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editMealModalLabel">Edit Meal</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editMealForm" action="/meals" method="POST">
+            <input type="hidden" id="editMealId" name="id">
+            <input type="hidden" name="action" value="update">
+            <div class="mb-3">
+              <label for="editTitle" class="form-label">Title</label>
+              <input type="text" class="form-control" id="editTitle" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label for="editProtein" class="form-label">Protein (g)</label>
+              <input type="number" step="0.1" class="form-control" id="editProtein" name="protein" required>
+            </div>
+            <div class="mb-3">
+              <label for="editCarb" class="form-label">Carb (g)</label>
+              <input type="number" step="0.1" class="form-control" id="editCarb" name="carb" required>
+            </div>
+            <div class="mb-3">
+              <label for="editFats" class="form-label">Fats (g)</label>
+              <input type="number" step="0.1" class="form-control" id="editFats" name="fats" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Meal</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -82,6 +116,19 @@
   <script>
     $(document).ready(function() {
       $('#mealsTable').DataTable();
+      $('.edit-btn').on('click', function() {
+        const id = $(this).data('id');
+        const title = $(this).data('title');
+        const protein = $(this).data('protein');
+        const carb = $(this).data('carb');
+        const fats = $(this).data('fats');
+        $('#editMealId').val(id);
+        $('#editTitle').val(title);
+        $('#editProtein').val(protein);
+        $('#editCarb').val(carb);
+        $('#editFats').val(fats);
+        $('#editMealModal').modal('show');
+      });
     });
   </script>
 </body>
