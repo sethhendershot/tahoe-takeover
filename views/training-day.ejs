@@ -97,6 +97,11 @@
         ['protein', 'carbs', 'fats'].forEach(macro => {
           document.getElementById(`${macro}Meal${i}`).addEventListener('change', function() {
             const mealId = this.value;
+            if (mealId) {
+              const selectedOption = this.options[this.selectedIndex];
+              const mealValue = selectedOption.dataset[macro];
+              document.getElementById(`${macro}${i}`).value = mealValue;
+            }
             fetch('/update-meal', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
