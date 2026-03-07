@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Check In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-light">
+  <%- include('menu') %>
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h1><i class="fas fa-plus-circle"></i> Create New Check In</h1>
+      </div>
+      <div class="card-body">
+        <form action="/add-check-in" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="weight" class="form-label">Weight (lbs)</label>
+            <input type="number" step="0.1" class="form-control" id="weight" name="weight" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="hips" class="form-label">Hips (in)</label>
+              <input type="number" step="0.1" class="form-control" id="hips" name="hips">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="waist" class="form-label">Waist (in)</label>
+              <input type="number" step="0.1" class="form-control" id="waist" name="waist">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="chest" class="form-label">Chest (in)</label>
+              <input type="number" step="0.1" class="form-control" id="chest" name="chest">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="arms" class="form-label">Arms (in)</label>
+              <input type="number" step="0.1" class="form-control" id="arms" name="arms">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="thighs" class="form-label">Thighs (in)</label>
+            <input type="number" step="0.1" class="form-control" id="thighs" name="thighs">
+          </div>
+          <div class="mb-3">
+            <label for="pictures" class="form-label">Pictures</label>
+            <input type="file" class="form-control" id="pictures" name="pictures" multiple accept="image/*">
+          </div>
+          <button type="submit" class="btn btn-primary">Save Check In</button>
+          <a href="/check-ins" class="btn btn-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

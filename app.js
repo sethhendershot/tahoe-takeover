@@ -289,26 +289,6 @@ app.get('/not-training-day', (req, res) => {
   res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide()['non-training'] });
 });
 
-app.get('/check-in-day', (req, res) => {
-  if (!req.session.user) return res.redirect('/');
-  const data = readData();
-  const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  const mealsData = readMeals();
-  let dayPlan = null;
-  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'check-in') {
-    dayPlan = { meals: [] };
-    for (let i = 1; i <= 6; i++) {
-      const meal = mealsData[selectedDate].meals[i] || {};
-      dayPlan.meals.push({
-        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
-        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
-        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
-      });
-    }
-  }
-  res.render('check-in-day', { meals: data.meals, dayPlan, selectedDate });
-});
-
 app.get('/load-meals', (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const mealsData = readMeals();
@@ -364,31 +344,6 @@ app.post('/not-training-day', (req, res) => {
   mealsData[date].type = 'not-training';
   mealsData[date].user = req.session.user;
   for (let i = 1; i <= 5; i++) {
-    mealsData[date].meals[i] = {
-      protein: parseFloat(req.body['protein' + i]) || 0,
-      carbs: parseFloat(req.body['carbs' + i]) || 0,
-      fats: parseFloat(req.body['fats' + i]) || 0,
-      proteinMealId: req.body['proteinMeal' + i],
-      carbsMealId: req.body['carbsMeal' + i],
-      fatsMealId: req.body['fatsMeal' + i]
-    };
-  }
-  writeMeals(mealsData);
-  res.redirect('/day-plans');
-});
-
-app.post('/check-in-day', (req, res) => {
-  if (!req.session.user) return res.redirect('/');
-  const mealsData = readMeals();
-  const date = req.body.date || new Date().toISOString().split('T')[0];
-  if (!mealsData[date]) {
-    mealsData[date] = { type: 'check-in', user: req.session.user, meals: {} };
-  } else if (!mealsData[date].meals) {
-    mealsData[date].meals = {};
-  }
-  mealsData[date].type = 'check-in';
-  mealsData[date].user = req.session.user;
-  for (let i = 1; i <= 6; i++) {
     mealsData[date].meals[i] = {
       protein: parseFloat(req.body['protein' + i]) || 0,
       carbs: parseFloat(req.body['carbs' + i]) || 0,
@@ -463,6 +418,11 @@ app.post('/add-check-in', upload.array('pictures', 10), (req, res) => {
   };
   writeCheckIns(checkInsData);
   res.redirect('/check-ins');
+});
+
+app.get('/create-check-in', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('create-check-in');
 });
 
 app.get('/statistics', (req, res) => {
