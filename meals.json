@@ -53,19 +53,5 @@
     },
     "type": "training",
     "user": "admin"
-  },
-  "undefined": {
-    "type": "training",
-    "user": "admin",
-    "meals": {
-      "NaN": {
-        "protein": 0,
-        "carbs": 0,
-        "fats": 0,
-        "proteinMealId": "",
-        "carbsMealId": "",
-        "fatsMealId": ""
-      }
-    }
   }
 }

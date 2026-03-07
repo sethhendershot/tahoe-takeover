@@ -418,6 +418,16 @@ app.post('/update-amount', (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/check-ins', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('check-ins', { user: req.session.user });
+});
+
+app.get('/statistics', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('statistics', { user: req.session.user });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
