@@ -3,13 +3,26 @@ const express = require('express');
 const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+
+// Multer setup for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
 const dataPath = path.join(__dirname, 'meal-options.json');
 const mealsPath = path.join(__dirname, 'meals.json');
 const guidePath = path.join(__dirname, 'meal-guide.json');
+const checkInsPath = path.join(__dirname, 'check-ins.json');
 
 // Helper functions
 function readData() {
@@ -49,6 +62,19 @@ function readGuide() {
 
 function writeGuide(data) {
   fs.writeFileSync(guidePath, JSON.stringify(data, null, 2));
+}
+
+function readCheckIns() {
+  try {
+    const data = fs.readFileSync(checkInsPath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return {};
+  }
+}
+
+function writeCheckIns(data) {
+  fs.writeFileSync(checkInsPath, JSON.stringify(data, null, 2));
 }
 
 // Middleware
@@ -420,14 +446,23 @@ app.post('/update-amount', (req, res) => {
 
 app.get('/check-ins', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const mealsData = readMeals();
-  const checkInsData = {};
-  Object.keys(mealsData).forEach(date => {
-    if (mealsData[date].type === 'check-in') {
-      checkInsData[date] = mealsData[date];
-    }
-  });
+  const checkInsData = readCheckIns();
   res.render('check-ins', { checkInsData, user: req.session.user });
+});
+
+app.post('/add-check-in', upload.array('pictures', 10), (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date, weight, hips, waist, chest, arms, thighs } = req.body; // Add more measurements as needed
+  const pictures = req.files.map(file => file.filename);
+  const checkInsData = readCheckIns();
+  checkInsData[date] = {
+    weight: parseFloat(weight),
+    measurements: { hips: parseFloat(hips), waist: parseFloat(waist), chest: parseFloat(chest), arms: parseFloat(arms), thighs: parseFloat(thighs) },
+    pictures: pictures,
+    user: req.session.user
+  };
+  writeCheckIns(checkInsData);
+  res.redirect('/check-ins');
 });
 
 app.get('/statistics', (req, res) => {

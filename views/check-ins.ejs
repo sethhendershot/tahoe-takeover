@@ -16,43 +16,96 @@
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h1><i class="fas fa-clipboard-check"></i> Check Ins</h1>
-        <a href="/check-in-day" class="btn btn-primary">Add New Check In</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCheckInModal">Add New Check In</button>
       </div>
       <div class="card-body">
         <table id="checkInsTable" class="table table-striped">
           <thead>
             <tr>
               <th>Date</th>
-              <th>Type</th>
-              <th>User</th>
-              <th>Total Protein (g)</th>
-              <th>Total Carbs (g)</th>
-              <th>Total Fats (g)</th>
+              <th>Weight (lbs)</th>
+              <th>Hips (in)</th>
+              <th>Waist (in)</th>
+              <th>Chest (in)</th>
+              <th>Arms (in)</th>
+              <th>Thighs (in)</th>
+              <th>Pictures</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <% Object.keys(checkInsData).forEach(date => { %>
-              <% 
-                let totalProtein = 0, totalCarbs = 0, totalFats = 0;
-                Object.values(checkInsData[date].meals).forEach(meal => {
-                  totalProtein += meal.protein || 0;
-                  totalCarbs += meal.carbs || 0;
-                  totalFats += meal.fats || 0;
-                });
-              %>
+              <% const checkIn = checkInsData[date]; %>
               <tr>
                 <td><%= date %></td>
-                <td><%= checkInsData[date].type %></td>
-                <td><%= checkInsData[date].user %></td>
-                <td><%= totalProtein %></td>
-                <td><%= totalCarbs %></td>
-                <td><%= totalFats %></td>
+                <td><%= checkIn.weight %></td>
+                <td><%= checkIn.measurements.hips %></td>
+                <td><%= checkIn.measurements.waist %></td>
+                <td><%= checkIn.measurements.chest %></td>
+                <td><%= checkIn.measurements.arms %></td>
+                <td><%= checkIn.measurements.thighs %></td>
+                <td>
+                  <% checkIn.pictures.forEach(pic => { %>
+                    <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; margin-right: 5px;">
+                  <% }); %>
+                </td>
                 <td><a href="/check-in-day?date=<%= date %>" class="btn btn-primary btn-sm">View Check In</a></td>
               </tr>
             <% }); %>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Check In Modal -->
+  <div class="modal fade" id="addCheckInModal" tabindex="-1" aria-labelledby="addCheckInModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCheckInModalLabel">Add New Check In</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/add-check-in" method="POST" enctype="multipart/form-data">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="mb-3">
+              <label for="weight" class="form-label">Weight (lbs)</label>
+              <input type="number" step="0.1" class="form-control" id="weight" name="weight" required>
+            </div>
+            <div class="mb-3">
+              <label for="hips" class="form-label">Hips (in)</label>
+              <input type="number" step="0.1" class="form-control" id="hips" name="hips">
+            </div>
+            <div class="mb-3">
+              <label for="waist" class="form-label">Waist (in)</label>
+              <input type="number" step="0.1" class="form-control" id="waist" name="waist">
+            </div>
+            <div class="mb-3">
+              <label for="chest" class="form-label">Chest (in)</label>
+              <input type="number" step="0.1" class="form-control" id="chest" name="chest">
+            </div>
+            <div class="mb-3">
+              <label for="arms" class="form-label">Arms (in)</label>
+              <input type="number" step="0.1" class="form-control" id="arms" name="arms">
+            </div>
+            <div class="mb-3">
+              <label for="thighs" class="form-label">Thighs (in)</label>
+              <input type="number" step="0.1" class="form-control" id="thighs" name="thighs">
+            </div>
+            <div class="mb-3">
+              <label for="pictures" class="form-label">Pictures</label>
+              <input type="file" class="form-control" id="pictures" name="pictures" multiple accept="image/*">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Check In</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
