@@ -25,8 +25,7 @@
         <% let meals = locals.meals || []; %>
         <form action="/check-in-day" method="GET" class="mb-3">
           <label for="date" class="form-label">Select Date</label>
-          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>">
-          <button type="submit" class="btn btn-secondary mt-2">Load Date</button>
+          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
         </form>
         <form action="/check-in-day" method="POST">
           <input type="hidden" name="date" value="<%= selectedDate %>">

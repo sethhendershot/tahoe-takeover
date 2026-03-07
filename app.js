@@ -146,14 +146,39 @@ app.get('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  res.render('training-day', { meals: data.meals, selectedDate });
+  const mealsData = readMeals();
+  let dayPlan = null;
+  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'training') {
+    dayPlan = { meals: [] };
+    for (let i = 1; i <= 6; i++) {
+      const meal = mealsData[selectedDate].meals[i] || {};
+      dayPlan.meals.push({
+        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
+        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
+        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
+      });
+    }
+  }
+  res.render('training-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
 app.get('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'not-training' && p.user === req.session.user) || null;
+  const mealsData = readMeals();
+  let dayPlan = null;
+  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'not-training') {
+    dayPlan = { meals: [] };
+    for (let i = 1; i <= 5; i++) {
+      const meal = mealsData[selectedDate].meals[i] || {};
+      dayPlan.meals.push({
+        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
+        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
+        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
+      });
+    }
+  }
   res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
@@ -161,95 +186,107 @@ app.get('/check-in-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'check-in' && p.user === req.session.user) || null;
+  const mealsData = readMeals();
+  let dayPlan = null;
+  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'check-in') {
+    dayPlan = { meals: [] };
+    for (let i = 1; i <= 6; i++) {
+      const meal = mealsData[selectedDate].meals[i] || {};
+      dayPlan.meals.push({
+        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
+        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
+        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
+      });
+    }
+  }
   res.render('check-in-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
 app.post('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const data = readData();
+  const mealsData = readMeals();
   const date = req.body.date || new Date().toISOString().split('T')[0];
-  let dayPlan = data.dayPlans.find(p => p.date === date && p.type === 'training' && p.user === req.session.user);
-  if (!dayPlan) {
-    dayPlan = {
-      id: Date.now(),
-      date,
-      type: 'training',
-      user: req.session.user,
-      meals: []
-    };
-    data.dayPlans.push(dayPlan);
-  } else {
-    dayPlan.meals = []; // reset
+  if (!mealsData[date]) {
+    mealsData[date] = { type: 'training', user: req.session.user, meals: {} };
+  } else if (!mealsData[date].meals) {
+    mealsData[date].meals = {};
   }
+  mealsData[date].type = 'training';
+  mealsData[date].user = req.session.user;
   for (let i = 1; i <= 6; i++) {
-    dayPlan.meals.push({
-      slot: i,
-      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
-      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
-      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
-    });
+    mealsData[date].meals[i] = {
+      protein: parseFloat(req.body['protein' + i]) || 0,
+      carbs: parseFloat(req.body['carbs' + i]) || 0,
+      fats: parseFloat(req.body['fats' + i]) || 0,
+      proteinMealId: req.body['proteinMeal' + i],
+      carbsMealId: req.body['carbsMeal' + i],
+      fatsMealId: req.body['fatsMeal' + i]
+    };
   }
-  writeData(data);
+  writeMeals(mealsData);
   res.redirect('/day-plans');
 });
 
 app.post('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const data = readData();
-  const dayPlan = {
-    id: Date.now(),
-    date: new Date().toISOString().split('T')[0],
-    type: 'not-training',
-    user: req.session.user,
-    meals: []
-  };
-  for (let i = 1; i <= 5; i++) {
-    dayPlan.meals.push({
-      slot: i,
-      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
-      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
-      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
-    });
+  const mealsData = readMeals();
+  const date = req.body.date || new Date().toISOString().split('T')[0];
+  if (!mealsData[date]) {
+    mealsData[date] = { type: 'not-training', user: req.session.user, meals: {} };
+  } else if (!mealsData[date].meals) {
+    mealsData[date].meals = {};
   }
-  data.dayPlans.push(dayPlan);
-  writeData(data);
+  mealsData[date].type = 'not-training';
+  mealsData[date].user = req.session.user;
+  for (let i = 1; i <= 5; i++) {
+    mealsData[date].meals[i] = {
+      protein: parseFloat(req.body['protein' + i]) || 0,
+      carbs: parseFloat(req.body['carbs' + i]) || 0,
+      fats: parseFloat(req.body['fats' + i]) || 0,
+      proteinMealId: req.body['proteinMeal' + i],
+      carbsMealId: req.body['carbsMeal' + i],
+      fatsMealId: req.body['fatsMeal' + i]
+    };
+  }
+  writeMeals(mealsData);
   res.redirect('/day-plans');
 });
 
 app.post('/check-in-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const data = readData();
+  const mealsData = readMeals();
   const date = req.body.date || new Date().toISOString().split('T')[0];
-  let dayPlan = data.dayPlans.find(p => p.date === date && p.type === 'check-in' && p.user === req.session.user);
-  if (!dayPlan) {
-    dayPlan = {
-      id: Date.now(),
-      date,
-      type: 'check-in',
-      user: req.session.user,
-      meals: []
-    };
-    data.dayPlans.push(dayPlan);
-  } else {
-    dayPlan.meals = []; // reset
+  if (!mealsData[date]) {
+    mealsData[date] = { type: 'check-in', user: req.session.user, meals: {} };
+  } else if (!mealsData[date].meals) {
+    mealsData[date].meals = {};
   }
+  mealsData[date].type = 'check-in';
+  mealsData[date].user = req.session.user;
   for (let i = 1; i <= 6; i++) {
-    dayPlan.meals.push({
-      slot: i,
-      protein: { amount: parseFloat(req.body['protein' + i]) || 0, mealId: req.body['proteinMeal' + i] },
-      carbs: { amount: parseFloat(req.body['carbs' + i]) || 0, mealId: req.body['carbsMeal' + i] },
-      fats: { amount: parseFloat(req.body['fats' + i]) || 0, mealId: req.body['fatsMeal' + i] }
-    });
+    mealsData[date].meals[i] = {
+      protein: parseFloat(req.body['protein' + i]) || 0,
+      carbs: parseFloat(req.body['carbs' + i]) || 0,
+      fats: parseFloat(req.body['fats' + i]) || 0,
+      proteinMealId: req.body['proteinMeal' + i],
+      carbsMealId: req.body['carbsMeal' + i],
+      fatsMealId: req.body['fatsMeal' + i]
+    };
   }
-  writeData(data);
+  writeMeals(mealsData);
   res.redirect('/day-plans');
 });
 
 app.get('/day-plans', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const data = readData();
-  res.render('day-plans', { dayPlans: data.dayPlans });
+  const mealsData = readMeals();
+  const dayPlans = Object.keys(mealsData).map(date => ({
+    date,
+    type: mealsData[date].type,
+    user: mealsData[date].user,
+    meals: Object.keys(mealsData[date].meals).length
+  }));
+  res.render('day-plans', { dayPlans });
 });
 
 app.get('/load-meals', (req, res) => {
@@ -262,10 +299,22 @@ app.get('/load-meals', (req, res) => {
 
 app.post('/update-meal', (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
-  const { date, mealNum, mealId } = req.body;
+  const { date, mealNum, macro, mealId } = req.body;
   const mealsData = readMeals();
   if (!mealsData[date]) mealsData[date] = {};
-  mealsData[date][mealNum] = mealId;
+  if (!mealsData[date][mealNum]) mealsData[date][mealNum] = {};
+  mealsData[date][mealNum][macro + 'MealId'] = mealId;
+  writeMeals(mealsData);
+  res.json({ success: true });
+});
+
+app.post('/update-amount', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date, mealNum, macro, amount } = req.body;
+  const mealsData = readMeals();
+  if (!mealsData[date]) mealsData[date] = {};
+  if (!mealsData[date][mealNum]) mealsData[date][mealNum] = {};
+  mealsData[date][mealNum][macro] = amount;
   writeMeals(mealsData);
   res.json({ success: true });
 });

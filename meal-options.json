@@ -111,106 +111,14 @@
       "protein": 30,
       "carb": 0,
       "fats": 0
+    },
+    {
+      "id": 1772906238361,
+      "title": "oatmeal - 2.25 oz uncooked",
+      "protein": 0,
+      "carb": 45,
+      "fats": 0
     }
   ],
-  "dayPlans": [
-    {
-      "id": 1772897178362,
-      "date": "2026-03-07",
-      "type": "training",
-      "user": "admin",
-      "meals": [
-        {
-          "slot": 1,
-          "protein": {
-            "amount": 30,
-            "mealId": "1772890705555"
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        },
-        {
-          "slot": 2,
-          "protein": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        },
-        {
-          "slot": 3,
-          "protein": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        },
-        {
-          "slot": 4,
-          "protein": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        },
-        {
-          "slot": 5,
-          "protein": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        },
-        {
-          "slot": 6,
-          "protein": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "carbs": {
-            "amount": 0,
-            "mealId": ""
-          },
-          "fats": {
-            "amount": 0,
-            "mealId": ""
-          }
-        }
-      ]
-    }
-  ]
+  "dayPlans": []
 }
