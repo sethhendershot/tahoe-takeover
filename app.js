@@ -40,8 +40,16 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const { username } = req.body;
-  if (username) {
+  const { username, password } = req.body;
+  if (username === 'admin') {
+    if (password === process.env.ADMIN_PASSWORD) {
+      req.session.user = 'admin';
+      req.session.isAdmin = true;
+      res.redirect('/');
+    } else {
+      res.redirect('/');
+    }
+  } else if (username) {
     req.session.user = username;
     res.redirect('/');
   } else {

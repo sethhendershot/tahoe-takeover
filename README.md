@@ -23,10 +23,10 @@ A Node.js Express application for collecting meal planning data with secure logi
 
 ## Features
 
-- Secure login with sessions
+- Secure login with sessions (admin password required for admin user)
 - Meal planning data stored in data.json
 - CRUD operations for meals
-- EJS templating for web interface
+- EJS templating with Bootstrap styling for web interface
 - Environment variable configuration
 
 ## Routes
