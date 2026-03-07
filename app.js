@@ -204,11 +204,11 @@ app.get('/meals-list', (req, res) => {
       return res.status(401).send('Please log in first');
     }
   }
-  const data = readData();
+  const mealsData = readMeals();
   if (req.accepts('html')) {
-    res.render('meal-list', { meals: data.meals });
+    res.render('meal-list', { mealsData });
   } else {
-    res.json(data.meals);
+    res.json(mealsData);
   }
 });
 
