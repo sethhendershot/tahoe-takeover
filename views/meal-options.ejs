@@ -14,31 +14,11 @@
   <%- include('menu') %>
   <div class="container mt-5">
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h1><i class="fas fa-utensils"></i> Meal Options</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMealModal">Add New Meal</button>
       </div>
       <div class="card-body">
-        <h2>Add New Meal</h2>
-        <form id="addMealForm" action="/meal-options" method="POST">
-          <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-          </div>
-          <div class="mb-3">
-            <label for="protein" class="form-label">Protein (g)</label>
-            <input type="number" step="0.1" class="form-control" id="protein" name="protein" required>
-          </div>
-          <div class="mb-3">
-            <label for="carb" class="form-label">Carb (g)</label>
-            <input type="number" step="0.1" class="form-control" id="carb" name="carb" required>
-          </div>
-          <div class="mb-3">
-            <label for="fats" class="form-label">Fats (g)</label>
-            <input type="number" step="0.1" class="form-control" id="fats" name="fats" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Add Meal</button>
-        </form>
-        <hr>
         <h2>All Meals</h2>
         <table id="mealsTable" class="display">
           <thead>
@@ -101,6 +81,38 @@
       </div>
     </div>
   </div>
+  <!-- Add Meal Modal -->
+  <div class="modal fade" id="addMealModal" tabindex="-1" aria-labelledby="addMealModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addMealModalLabel">Add New Meal</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addMealForm" action="/meals" method="POST">
+            <div class="mb-3">
+              <label for="title" class="form-label">Title</label>
+              <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label for="protein" class="form-label">Protein (g)</label>
+              <input type="number" step="0.1" class="form-control" id="protein" name="protein" required>
+            </div>
+            <div class="mb-3">
+              <label for="carb" class="form-label">Carb (g)</label>
+              <input type="number" step="0.1" class="form-control" id="carb" name="carb" required>
+            </div>
+            <div class="mb-3">
+              <label for="fats" class="form-label">Fats (g)</label>
+              <input type="number" step="0.1" class="form-control" id="fats" name="fats" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Meal Option</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Toast Notification -->
   <div class="toast-container position-fixed top-0 end-0 p-3">
     <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -119,6 +131,7 @@
           if (response.success) {
             showToast(response.message, 'success');
             $(this).trigger('reset'); // Clear the form
+            $('#addMealModal').modal('hide'); // Close the modal
             // Add new row using DataTable API
             const table = $('#mealsTable').DataTable();
             const meal = response.meal;
