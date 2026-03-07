@@ -9,12 +9,14 @@ A Node.js Express application for collecting meal planning data with secure logi
    npm install
    ```
 
-2. Start the server:
+2. Create a `.env` file with environment variables (see .env.example if provided).
+
+3. Start the server:
    ```
    npm start
    ```
 
-3. For development with auto-restart:
+4. For development with auto-restart:
    ```
    npm run dev
    ```
@@ -24,14 +26,16 @@ A Node.js Express application for collecting meal planning data with secure logi
 - Secure login with sessions
 - Meal planning data stored in data.json
 - CRUD operations for meals
+- EJS templating for web interface
+- Environment variable configuration
 
-## API Endpoints
+## Routes
 
-- GET / - Check login status
-- POST /login - Login with username
+- GET / - Home page with login/logout
+- POST /login - Login form submission
 - POST /logout - Logout
-- GET /meals - Get all meals (requires login)
-- POST /meals - Add a new meal (requires login, body: {name, date, ...})
+- GET /meals - Get all meals (JSON API, requires login)
+- POST /meals - Add a new meal (JSON API, requires login, body: {name, date, ...})
 
 ## Development
 

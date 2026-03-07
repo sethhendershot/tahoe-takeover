@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meal Planning App</title>
+</head>
+<body>
+  <% if (user) { %>
+    <h1>Welcome, <%= user %>!</h1>
+    <a href="/meals">View Meals</a>
+    <form action="/logout" method="POST" style="display: inline;">
+      <button type="submit">Logout</button>
+    </form>
+  <% } else { %>
+    <h1>Please log in</h1>
+    <form action="/login" method="POST">
+      <input type="text" name="username" placeholder="Username" required>
+      <button type="submit">Login</button>
+    </form>
+  <% } %>
+</body>
+</html>

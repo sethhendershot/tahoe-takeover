@@ -1,9 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
+app.set('view engine', 'ejs');
 const dataPath = path.join(__dirname, 'data.json');
 
 // Helper functions
@@ -26,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
 app.use(session({
-  secret: 'your-secret-key-change-this-in-production',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // Set to true if using HTTPS
@@ -34,31 +36,22 @@ app.use(session({
 
 // Routes
 app.get('/', (req, res) => {
-  if (req.session.user) {
-    res.send(`Welcome back, ${req.session.user}!`);
-  } else {
-    res.send('Please log in.');
-  }
+  res.render('home', { user: req.session.user });
 });
 
 app.post('/login', (req, res) => {
-  // Simple login for demo - in real app, verify credentials
   const { username } = req.body;
   if (username) {
     req.session.user = username;
-    res.send('Logged in successfully!');
+    res.redirect('/');
   } else {
-    res.status(400).send('Username required');
+    res.redirect('/');
   }
 });
 
 app.post('/logout', (req, res) => {
   req.session.destroy((err) => {
-    if (err) {
-      res.status(500).send('Could not log out');
-    } else {
-      res.send('Logged out successfully!');
-    }
+    res.redirect('/');
   });
 });
 
