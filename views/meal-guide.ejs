@@ -225,10 +225,19 @@
         }
 
         $('#saveBtn').click(() => {
-          const formData = new FormData(document.getElementById('mealForm'));
+          const data = {
+            action: $('#action').val(),
+            dayType: $('#dayType').val(),
+            meal: $('#meal').val(),
+            protein: $('#protein').val(),
+            carb: $('#carb').val(),
+            fats: $('#fats').val(),
+            id: $('#id').val()
+          };
           fetch('/meal-guide', {
             method: 'POST',
-            body: new URLSearchParams(formData)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
           }).then(res => res.json()).then(data => {
             if (data.success) {
               location.reload();
@@ -241,8 +250,8 @@
         function deleteMeal(dayType, mealId) {
           fetch('/meal-guide', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ action: 'delete', dayType, id: mealId })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', dayType, id: mealId })
           }).then(res => res.json()).then(data => {
             if (data.success) {
               location.reload();
