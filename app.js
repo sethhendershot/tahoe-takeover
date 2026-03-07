@@ -98,7 +98,9 @@ app.post('/meals', (req, res) => {
 app.get('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
-  res.render('training-day', { meals: data.meals });
+  const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
+  const dayPlan = data.dayPlans.find(p => p.date === selectedDate && p.type === 'training' && p.user === req.session.user) || null;
+  res.render('training-day', { meals: data.meals, dayPlan, selectedDate });
 });
 
 app.get('/not-training-day', (req, res) => {
@@ -115,13 +117,20 @@ app.get('/check-in-day', (req, res) => {
 app.post('/training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
-  const dayPlan = {
-    id: Date.now(),
-    date: new Date().toISOString().split('T')[0],
-    type: 'training',
-    user: req.session.user,
-    meals: []
-  };
+  const date = req.body.date || new Date().toISOString().split('T')[0];
+  let dayPlan = data.dayPlans.find(p => p.date === date && p.type === 'training' && p.user === req.session.user);
+  if (!dayPlan) {
+    dayPlan = {
+      id: Date.now(),
+      date,
+      type: 'training',
+      user: req.session.user,
+      meals: []
+    };
+    data.dayPlans.push(dayPlan);
+  } else {
+    dayPlan.meals = []; // reset
+  }
   for (let i = 1; i <= 6; i++) {
     dayPlan.meals.push({
       slot: i,
@@ -130,7 +139,6 @@ app.post('/training-day', (req, res) => {
       fats: { amount: parseFloat(req.body['fats' + i]), mealId: req.body['fatsMeal' + i] }
     });
   }
-  data.dayPlans.push(dayPlan);
   writeData(data);
   res.redirect('/day-plans');
 });

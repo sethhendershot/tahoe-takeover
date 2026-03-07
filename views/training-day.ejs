@@ -25,38 +25,44 @@
         <a href="/" class="btn btn-secondary">Back to Home</a>
       </div>
       <div class="card-body">
+        <form action="/training-day" method="GET" class="mb-3">
+          <label for="date" class="form-label">Select Date</label>
+          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>">
+          <button type="submit" class="btn btn-secondary mt-2">Load Date</button>
+        </form>
         <form action="/training-day" method="POST">
+          <input type="hidden" name="date" value="<%= selectedDate %>">
           <% for (let i = 1; i <= 6; i++) { %>
             <div class="mb-4">
               <h5>Meal <%= i %></h5>
               <div class="row">
                 <div class="col-md-4">
                   <label class="form-label">Protein (g)</label>
-                  <input type="number" step="0.1" class="form-control" name="protein<%= i %>" required>
+                  <input type="number" step="0.1" class="form-control" name="protein<%= i %>" value="<%= dayPlan && dayPlan.meals[i-1] ? dayPlan.meals[i-1].protein.amount : '' %>" required>
                   <select class="form-select mt-1" name="proteinMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).forEach(meal => { %>
-                      <option value="<%= meal.id %>"><%= meal.title %> (P: <%= meal.protein %>g)</option>
+                      <option value="<%= meal.id %>" <%= dayPlan && dayPlan.meals[i-1] && dayPlan.meals[i-1].protein.mealId == meal.id ? 'selected' : '' %>><%= meal.title %> (P: <%= meal.protein %>g)</option>
                     <% }); %>
                   </select>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Carbs (g)</label>
-                  <input type="number" step="0.1" class="form-control" name="carbs<%= i %>" required>
+                  <input type="number" step="0.1" class="form-control" name="carbs<%= i %>" value="<%= dayPlan && dayPlan.meals[i-1] ? dayPlan.meals[i-1].carbs.amount : '' %>" required>
                   <select class="form-select mt-1" name="carbsMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).forEach(meal => { %>
-                      <option value="<%= meal.id %>"><%= meal.title %> (C: <%= meal.carb %>g)</option>
+                      <option value="<%= meal.id %>" <%= dayPlan && dayPlan.meals[i-1] && dayPlan.meals[i-1].carbs.mealId == meal.id ? 'selected' : '' %>><%= meal.title %> (C: <%= meal.carb %>g)</option>
                     <% }); %>
                   </select>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Fats (g)</label>
-                  <input type="number" step="0.1" class="form-control" name="fats<%= i %>" required>
+                  <input type="number" step="0.1" class="form-control" name="fats<%= i %>" value="<%= dayPlan && dayPlan.meals[i-1] ? dayPlan.meals[i-1].fats.amount : '' %>" required>
                   <select class="form-select mt-1" name="fatsMeal<%= i %>">
                     <option value="">Select Meal</option>
                     <% (meals || []).forEach(meal => { %>
-                      <option value="<%= meal.id %>"><%= meal.title %> (F: <%= meal.fats %>g)</option>
+                      <option value="<%= meal.id %>" <%= dayPlan && dayPlan.meals[i-1] && dayPlan.meals[i-1].fats.mealId == meal.id ? 'selected' : '' %>><%= meal.title %> (F: <%= meal.fats %>g)</option>
                     <% }); %>
                   </select>
                 </div>
