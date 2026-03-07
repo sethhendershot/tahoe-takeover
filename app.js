@@ -85,32 +85,47 @@ app.post('/meals', (req, res) => {
     if (req.accepts('html')) {
       return res.redirect('/');
     } else {
-      return res.status(401).send('Please log in first');
+      return res.status(401).json({ message: 'Please log in first' });
     }
   }
-  if (req.body.action === 'update') {
+  if (req.body.action === 'delete') {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ message: 'ID required' });
+    }
+    const data = readData();
+    data.meals = data.meals.filter(m => m.id !== parseInt(id));
+    writeData(data);
+    if (req.accepts('html')) {
+      res.redirect('/meals');
+    } else {
+      res.json({ message: 'Meal deleted successfully!' });
+    }
+  } else {
     const { id, title, protein, carb, fats } = req.body;
-    if (!id || !title || protein == null || carb == null || fats == null) {
-      return res.status(400).send('All fields required');
-    }
-    const data = readData();
-    data.meals = data.meals.map(m => m.id === parseInt(id) ? { ...m, title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) } : m);
-    writeData(data);
-  } else {
-    const { title, protein, carb, fats } = req.body;
     if (!title || protein == null || carb == null || fats == null) {
-      return res.status(400).send('All fields required');
+      return res.status(400).json({ message: 'All fields required' });
     }
     const data = readData();
-    const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
-    data.meals.push(meal);
+    if (id) {
+      // Update if exists, or create new with given id
+      const existingIndex = data.meals.findIndex(m => m.id === parseInt(id));
+      if (existingIndex !== -1) {
+        data.meals[existingIndex] = { ...data.meals[existingIndex], title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+      } else {
+        data.meals.push({ id: parseInt(id), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) });
+      }
+    } else {
+      // Create new meal
+      const meal = { id: Date.now(), title, protein: parseFloat(protein), carb: parseFloat(carb), fats: parseFloat(fats) };
+      data.meals.push(meal);
+    }
     writeData(data);
-  }
-  if (req.accepts('html')) {
-    res.redirect('/meals');
-  } else {
-    const message = req.body.action === 'update' ? 'Your meal has been updated successfully!' : 'New meal added to your list!';
-    res.json({ message });
+    if (req.accepts('html')) {
+      res.redirect('/meals');
+    } else {
+      res.json({ message: id ? 'Meal updated or added successfully!' : 'New meal added to your list!' });
+    }
   }
 });
 

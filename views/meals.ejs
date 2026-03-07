@@ -27,7 +27,7 @@
       </div>
       <div class="card-body">
         <h2>Add New Meal</h2>
-        <form action="/meals" method="POST">
+        <form id="addMealForm" action="/meals" method="POST">
           <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input type="text" class="form-control" id="title" name="title" required>
@@ -67,7 +67,7 @@
                 <td><%= meal.fats %></td>
                 <td>
                 <button class="btn btn-sm btn-warning edit-btn" data-id="<%= meal.id %>" data-title="<%= meal.title %>" data-protein="<%= meal.protein %>" data-carb="<%= meal.carb %>" data-fats="<%= meal.fats %>">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                <button class="btn btn-sm btn-danger delete-btn" data-id="<%= meal.id %>">Delete</button>
               </td>
               </tr>
             <% }); %>
@@ -87,7 +87,6 @@
         <div class="modal-body">
           <form id="editMealForm" action="/meals" method="POST">
             <input type="hidden" id="editMealId" name="id">
-            <input type="hidden" name="action" value="update">
             <div class="mb-3">
               <label for="editTitle" class="form-label">Title</label>
               <input type="text" class="form-control" id="editTitle" name="title" required>
@@ -121,7 +120,27 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     $(document).ready(function() {
-      $('#mealsTable').DataTable();
+      $('#mealsTable').DataTable({ pageLength: 25 });
+      $('#addMealForm').on('submit', function(e) {
+        e.preventDefault();
+        $.post('/meals', $(this).serialize(), function(response) {
+          showToast(response.message, 'success');
+          $(this).trigger('reset'); // Clear the form
+          updateTable();
+        }.bind(this)).fail(function(xhr) {
+          showToast('Error adding meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+        });
+      });
+      $('#editMealForm').on('submit', function(e) {
+        e.preventDefault();
+        $.post('/meals', $(this).serialize(), function(response) {
+          showToast(response.message, 'success');
+          $('#editMealModal').modal('hide');
+          updateTable();
+        }).fail(function(xhr) {
+          showToast('Error updating meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+        });
+      });
       $('#mealsTable').on('click', '.edit-btn', function() {
         const id = $(this).data('id');
         const title = $(this).data('title');
@@ -135,25 +154,48 @@
         $('#editFats').val(fats);
         $('#editMealModal').modal('show');
       });
-      $('#saveMeal').on('click', function(e) {
-        e.preventDefault();
-        const data = {
-          id: $('#editMealId').val(),
-          title: $('#editTitle').val(),
-          protein: $('#editProtein').val(),
-          carb: $('#editCarb').val(),
-          fats: $('#editFats').val(),
-          action: 'update'
-        };
-        $.post('/meals', data, function(response) {
-          $('#editMealModal').modal('hide');
-          showToast(response.message, 'success');
-          //location.reload();
-        }).fail(function(xhr) {
-          $('#editMealModal').modal('hide');
-          showToast('Error updating meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
-        });
+      $('#mealsTable').on('click', '.delete-btn', function() {
+        const id = $(this).data('id');
+        if (confirm('Are you sure you want to delete this meal?')) {
+          $.post('/meals', { id, action: 'delete' }, function(response) {
+            showToast(response.message, 'success');
+            updateTable();
+          }).fail(function(xhr) {
+            showToast('Error deleting meal: ' + xhr.responseJSON?.message || xhr.statusText, 'danger');
+          });
+        }
       });
+      function updateTable() {
+        $.ajax({
+          url: '/meals',
+          headers: { 'Accept': 'application/json' },
+          success: function(meals) {
+            const tbody = $('#mealsTable tbody');
+            tbody.empty();
+            meals.forEach(meal => {
+              tbody.append(`
+                <tr>
+                  <td>${meal.title}</td>
+                  <td>${meal.protein}</td>
+                  <td>${meal.carb}</td>
+                  <td>${meal.fats}</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning edit-btn" data-id="${meal.id}" data-title="${meal.title}" data-protein="${meal.protein}" data-carb="${meal.carb}" data-fats="${meal.fats}">Edit</button>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="${meal.id}">Delete</button>
+                  </td>
+                </tr>
+              `);
+            });
+            if ($.fn.DataTable.isDataTable('#mealsTable')) {
+              $('#mealsTable').DataTable().destroy();
+            }
+            $('#mealsTable').DataTable({ pageLength: 25 });
+          },
+          error: function() {
+            showToast('Error fetching meals', 'danger');
+          }
+        });
+      }
       function showToast(message, type) {
         $('#toast .toast-body').text(message);
         $('#toast').removeClass('bg-success bg-danger text-white').addClass(type === 'success' ? 'bg-success' : 'bg-danger').addClass('text-white');
