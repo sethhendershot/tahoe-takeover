@@ -73,6 +73,14 @@
         "proteinMealId": "1772889775049",
         "carbsMealId": "1772906238361",
         "fatsMealId": ""
+      },
+      "3": {
+        "protein": 25,
+        "carbs": 45,
+        "fats": 0,
+        "proteinMealId": "1772889738137",
+        "carbsMealId": "1772906238361",
+        "fatsMealId": ""
       }
     }
   },
@@ -86,6 +94,14 @@
         "fats": 0,
         "proteinMealId": "1772889533899",
         "carbsMealId": "1772906238361",
+        "fatsMealId": ""
+      },
+      "2": {
+        "protein": 30,
+        "carbs": 0,
+        "fats": 0,
+        "proteinMealId": "1772889645626",
+        "carbsMealId": "",
         "fatsMealId": ""
       }
     }

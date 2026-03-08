@@ -24,16 +24,16 @@
         <% let meals = locals.meals || []; %>
         <% let existingDayType = locals.existingDayType; %>
         <% let isEditable = !existingDayType || existingDayType === 'training'; %>
+        <form action="/training-day" method="GET" class="mb-3">
+          <label for="date" class="form-label">Select Date</label>
+          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
+        </form>
         <% if (existingDayType === 'not-training') { %>
           <div class="alert alert-warning">
             <strong>This day is saved as a Not-Training Day.</strong> You can convert it to a Training Day to enable editing.
             <button id="convertBtn" class="btn btn-primary btn-sm ms-2">Convert to Training Day</button>
           </div>
         <% } %>
-        <form action="/training-day" method="GET" class="mb-3">
-          <label for="date" class="form-label">Select Date</label>
-          <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
-        </form>
         <% for (let i = 1; i <= 6; i++) { %>
           <form class="meal-form" data-meal="<%= i %>">
             <input type="hidden" name="date" value="<%= selectedDate %>">
