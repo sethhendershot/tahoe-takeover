@@ -26,5 +26,16 @@
       "1772942464056-IMG_0247.jpeg"
     ],
     "user": "admin"
+  },
+  "2026-03-09": {
+    "weight": 111,
+    "measurements": {
+      "waist": 4,
+      "hips": 4
+    },
+    "pictures": [
+      "1772943067372-IMG_0059.PNG"
+    ],
+    "user": "admin"
   }
 }

@@ -16,7 +16,10 @@
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h1><i class="fas fa-clipboard-check"></i> Check Ins</h1>
-        <a href="/create-check-in" class="btn btn-primary">Add New Check In</a>
+        <div>
+          <button type="button" class="btn btn-info me-2" id="compareBtn" onclick="showCompare()" style="display: none;">Compare Selected</button>
+          <a href="/create-check-in" class="btn btn-primary">Add New Check In</a>
+        </div>
       </div>
       <div class="card-body">
         <table id="checkInsTable" class="table table-striped">
@@ -40,7 +43,10 @@
                 <td><%= checkIn.measurements.hips %></td>
                 <td>
                   <% checkIn.pictures.forEach((pic, index) => { %>
-                    <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; margin-right: 5px; cursor: pointer;" onclick="viewImage('/uploads/<%= pic %>', '<%= date %>', <%= index %>)">
+                    <div class="d-inline-block position-relative me-2 mb-2">
+                      <input type="checkbox" class="picture-checkbox" data-src="/uploads/<%= pic %>" data-date="<%= date %>" style="position: absolute; top: 2px; left: 2px; z-index: 10;">
+                      <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; cursor: pointer;" onclick="viewImage('/uploads/<%= pic %>', '<%= date %>', <%= index %>)">
+                    </div>
                   <% }); %>
                 </td>
                 <td><button type="button" class="btn btn-warning btn-sm me-2" onclick="editCheckIn('<%= date %>')">Edit</button><button type="button" class="btn btn-primary btn-sm me-2" onclick="viewCheckIn('<%= date %>')">View Check In</button><button type="button" class="btn btn-danger btn-sm" onclick="deleteCheckIn('<%= date %>')">Delete</button></td>
@@ -159,9 +165,23 @@
       </div>
     </div>
   </div>
-  <script>
-    var checkInsData = <%- JSON.stringify(checkInsData) %>;
-  </script>
+
+  <!-- Compare Pictures Modal -->
+  <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="compareModalLabel">Compare Pictures</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="compareContainer" class="d-flex flex-wrap justify-content-center gap-3">
+            <!-- Pictures will be added here dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script>
@@ -399,6 +419,73 @@
         console.error('Error:', error);
         alert('Error deleting picture');
       });
+    }
+
+    // Compare functionality
+    let selectedPictures = [];
+
+    function updateCompareButton() {
+      const compareBtn = document.getElementById('compareBtn');
+      if (selectedPictures.length >= 2 && selectedPictures.length <= 4) {
+        compareBtn.style.display = 'inline-block';
+      } else {
+        compareBtn.style.display = 'none';
+      }
+    }
+
+    // Add event listeners to checkboxes
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.picture-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const src = this.getAttribute('data-src');
+          const date = this.getAttribute('data-date');
+
+          if (this.checked) {
+            if (selectedPictures.length < 4) {
+              selectedPictures.push({ src, date });
+            } else {
+              this.checked = false;
+              alert('You can select a maximum of 4 pictures to compare.');
+            }
+          } else {
+            selectedPictures = selectedPictures.filter(pic => !(pic.src === src && pic.date === date));
+          }
+
+          updateCompareButton();
+        });
+      });
+    });
+
+    function showCompare() {
+      const compareContainer = document.getElementById('compareContainer');
+      compareContainer.innerHTML = '';
+
+      selectedPictures.forEach(picture => {
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'text-center';
+        imgContainer.style.flex = '1';
+        imgContainer.style.minWidth = '200px';
+
+        const img = document.createElement('img');
+        img.src = picture.src;
+        img.alt = 'Comparison picture';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '300px';
+        img.style.objectFit = 'contain';
+        img.style.border = '1px solid #ddd';
+        img.style.borderRadius = '5px';
+
+        const dateLabel = document.createElement('p');
+        dateLabel.className = 'mt-2 mb-0 text-muted';
+        dateLabel.textContent = 'Date: ' + picture.date;
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(dateLabel);
+        compareContainer.appendChild(imgContainer);
+      });
+
+      var modal = new bootstrap.Modal(document.getElementById('compareModal'));
+      modal.show();
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
