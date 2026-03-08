@@ -17,7 +17,7 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h1><i class="fas fa-clipboard-check"></i> Check Ins</h1>
         <div>
-          <button type="button" class="btn btn-info me-2" id="compareBtn" onclick="showCompare()" style="display: none;">Compare Selected</button>
+          <button type="button" class="btn btn-info me-2" id="compareBtn" onclick="showCompare()">Compare Pictures</button>
           <a href="/create-check-in" class="btn btn-primary">Add New Check In</a>
         </div>
       </div>
@@ -175,7 +175,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="compareContainer" class="d-flex flex-wrap justify-content-center gap-3">
+          <div id="compareContainer" class="d-flex flex-wrap justify-content-center gap-1">
             <!-- Pictures will be added here dynamically -->
           </div>
         </div>
@@ -186,6 +186,7 @@
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script>
     var checkInsData = <%- JSON.stringify(checkInsData) %>;
+    let compareModalInstance = null;
 
     $(document).ready(function() {
       $('#checkInsTable').DataTable();
@@ -458,11 +459,20 @@
       });
     });
 
+    function moveComparePicture(index, direction) {
+      if (direction === 'left' && index > 0) {
+        [selectedPictures[index], selectedPictures[index-1]] = [selectedPictures[index-1], selectedPictures[index]];
+      } else if (direction === 'right' && index < selectedPictures.length - 1) {
+        [selectedPictures[index], selectedPictures[index+1]] = [selectedPictures[index+1], selectedPictures[index]];
+      }
+      showCompare();
+    }
+
     function showCompare() {
       const compareContainer = document.getElementById('compareContainer');
       compareContainer.innerHTML = '';
 
-      selectedPictures.forEach(picture => {
+      selectedPictures.forEach((picture, index) => {
         const imgContainer = document.createElement('div');
         imgContainer.className = 'text-center';
         imgContainer.style.flex = '1';
@@ -481,13 +491,31 @@
         dateLabel.className = 'mt-2 mb-0 text-muted';
         dateLabel.textContent = 'Date: ' + picture.date;
 
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'mt-2';
+        const leftBtn = document.createElement('button');
+        leftBtn.className = 'btn btn-sm btn-outline-secondary me-1';
+        leftBtn.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        leftBtn.onclick = () => moveComparePicture(index, 'left');
+        const rightBtn = document.createElement('button');
+        rightBtn.className = 'btn btn-sm btn-outline-secondary';
+        rightBtn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        rightBtn.onclick = () => moveComparePicture(index, 'right');
+        buttonContainer.appendChild(leftBtn);
+        buttonContainer.appendChild(rightBtn);
+
         imgContainer.appendChild(img);
         imgContainer.appendChild(dateLabel);
+        imgContainer.appendChild(buttonContainer);
         compareContainer.appendChild(imgContainer);
       });
 
-      var modal = new bootstrap.Modal(document.getElementById('compareModal'));
-      modal.show();
+      if (!compareModalInstance) {
+        compareModalInstance = new bootstrap.Modal(document.getElementById('compareModal'));
+      }
+      if (!document.getElementById('compareModal').classList.contains('show')) {
+        compareModalInstance.show();
+      }
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
