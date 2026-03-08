@@ -260,25 +260,34 @@ app.get('/training-day', (req, res) => {
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
   const mealsData = readMeals();
   let dayPlan = null;
-  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'training') {
-    dayPlan = { meals: [] };
-    for (let i = 1; i <= 6; i++) {
-      const meal = mealsData[selectedDate].meals[i] || {};
-      dayPlan.meals.push({
-        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
-        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
-        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
-      });
+  let existingDayType = null;
+  if (mealsData[selectedDate]) {
+    existingDayType = mealsData[selectedDate].type;
+    if (mealsData[selectedDate].type === 'training') {
+      dayPlan = { meals: [] };
+      for (let i = 1; i <= 6; i++) {
+        const meal = mealsData[selectedDate].meals[i] || {};
+        dayPlan.meals.push({
+          protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
+          carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
+          fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
+        });
+      }
     }
   }
-  res.render('training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide().training });
+  res.render('training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide().training, existingDayType });
 });
 
 app.get('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  res.render('not-training-day', { meals: data.meals, selectedDate, guide: readGuide()['non-training'] });
+  const mealsData = readMeals();
+  let existingDayType = null;
+  if (mealsData[selectedDate]) {
+    existingDayType = mealsData[selectedDate].type;
+  }
+  res.render('not-training-day', { meals: data.meals, selectedDate, guide: readGuide()['non-training'], existingDayType });
 });
 
 app.get('/load-meals', (req, res) => {
@@ -355,6 +364,21 @@ app.post('/not-training-day', (req, res) => {
       fatsMealId: fatsMealId || ''
     };
   }
+  writeMeals(mealsData);
+  res.json({ success: true });
+});
+
+app.post('/convert-day-type', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const mealsData = readMeals();
+  const { date, newType } = req.body;
+  if (!mealsData[date]) {
+    return res.status(400).json({ error: 'Day not found' });
+  }
+  if (newType !== 'training' && newType !== 'not-training') {
+    return res.status(400).json({ error: 'Invalid type' });
+  }
+  mealsData[date].type = newType;
   writeMeals(mealsData);
   res.json({ success: true });
 });

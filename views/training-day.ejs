@@ -22,6 +22,14 @@
       <div class="card-body">
         <% let selectedDate = locals.selectedDate || new Date().toISOString().split('T')[0]; %>
         <% let meals = locals.meals || []; %>
+        <% let existingDayType = locals.existingDayType; %>
+        <% let isEditable = !existingDayType || existingDayType === 'training'; %>
+        <% if (existingDayType === 'not-training') { %>
+          <div class="alert alert-warning">
+            <strong>This day is saved as a Not-Training Day.</strong> You can convert it to a Training Day to enable editing.
+            <button id="convertBtn" class="btn btn-primary btn-sm ms-2">Convert to Training Day</button>
+          </div>
+        <% } %>
         <form action="/training-day" method="GET" class="mb-3">
           <label for="date" class="form-label">Select Date</label>
           <input type="date" class="form-control" id="date" name="date" value="<%= selectedDate %>" onchange="this.form.submit()">
@@ -36,10 +44,10 @@
               <div class="row">
                 <div class="col-md-4">
                   <label class="form-label">Protein (g)</label>
-                  <input type="number" step="1" class="form-control" id="protein<%= i %>" name="protein" value="">
+                  <input type="number" step="1" class="form-control" id="protein<%= i %>" name="protein" value="" <%= isEditable ? '' : 'disabled' %>>
                   <% const mealGuide = (locals.guide || []).find(m => m.meal === i); %>
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.protein + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="proteinMeal<%= i %>" name="proteinMealId">
+                  <select class="form-select mt-1" id="proteinMeal<%= i %>" name="proteinMealId" <%= isEditable ? '' : 'disabled' %>>
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.protein > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-protein="<%= meal.protein %>"><%= meal.title %> (P: <%= meal.protein %>g)</option>
@@ -48,9 +56,9 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Carbs (g)</label>
-                  <input type="number" step="1" class="form-control" id="carbs<%= i %>" name="carbs" value="">
+                  <input type="number" step="1" class="form-control" id="carbs<%= i %>" name="carbs" value="" <%= isEditable ? '' : 'disabled' %>>
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.carb + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMealId">
+                  <select class="form-select mt-1" id="carbsMeal<%= i %>" name="carbsMealId" <%= isEditable ? '' : 'disabled' %>>
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.carb > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-carbs="<%= meal.carb %>"><%= meal.title %> (C: <%= meal.carb %>g)</option>
@@ -59,9 +67,9 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Fats (g)</label>
-                  <input type="number" step="1" class="form-control" id="fats<%= i %>" name="fats" value="">
+                  <input type="number" step="1" class="form-control" id="fats<%= i %>" name="fats" value="" <%= isEditable ? '' : 'disabled' %>>
                   <span class="guidance text-muted small">Suggested: <%= mealGuide ? mealGuide.fats + 'g' : 'N/A' %></span>
-                  <select class="form-select mt-1" id="fatsMeal<%= i %>" name="fatsMealId">
+                  <select class="form-select mt-1" id="fatsMeal<%= i %>" name="fatsMealId" <%= isEditable ? '' : 'disabled' %>>
                     <option value="">Select Meal</option>
                     <% (meals || []).filter(meal => meal.fats > 0).forEach(meal => { %>
                       <option value="<%= meal.id %>" data-fats="<%= meal.fats %>"><%= meal.title %> (F: <%= meal.fats %>g)</option>
@@ -69,7 +77,9 @@
                   </select>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary mt-2" id="logBtn<%= i %>">Log Meal</button>
+              <% if (isEditable) { %>
+                <button type="submit" class="btn btn-primary mt-2" id="logBtn<%= i %>">Log Meal</button>
+              <% } %>
             </div>
           </form>
         <% } %>
@@ -150,6 +160,20 @@
               const mealValue = selectedOption.dataset[macro];
               document.getElementById(`${macro}${i}`).value = mealValue;
             }
+          });
+        });
+      }
+
+      // Convert day type
+      const convertBtn = document.getElementById('convertBtn');
+      if (convertBtn) {
+        convertBtn.addEventListener('click', function() {
+          fetch('/convert-day-type', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: selectedDate, newType: 'training' })
+          }).then(res => res.json()).then(() => {
+            location.reload();
           });
         });
       }
