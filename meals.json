@@ -75,5 +75,33 @@
         "fatsMealId": ""
       }
     }
+  },
+  "2026-03-06": {
+    "type": "training",
+    "user": "admin",
+    "meals": {
+      "1": {
+        "protein": 30,
+        "carbs": 45,
+        "fats": 0,
+        "proteinMealId": "1772889533899",
+        "carbsMealId": "1772906238361",
+        "fatsMealId": ""
+      }
+    }
+  },
+  "2026-03-09": {
+    "type": "not-training",
+    "user": "admin",
+    "meals": {
+      "1": {
+        "protein": 25,
+        "carbs": 45,
+        "fats": 0,
+        "proteinMealId": "1772889775049",
+        "carbsMealId": "1772906238361",
+        "fatsMealId": ""
+      }
+    }
   }
 }

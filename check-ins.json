@@ -14,5 +14,22 @@
       "1772917481446-SKNRBX-NASA.png"
     ],
     "user": "admin"
+  },
+  "2026-03-08": {
+    "weight": 12,
+    "measurements": {
+      "hips": 1,
+      "waist": 2,
+      "chest": 2,
+      "arms": 2,
+      "thighs": 2
+    },
+    "pictures": [
+      "1772939756174-IMG_0001.PNG",
+      "1772939756177-IMG_0047.JPEG",
+      "1772939756182-IMG_0245.JPEG",
+      "1772939756197-IMG_0269.JPEG"
+    ],
+    "user": "admin"
   }
 }
