@@ -185,6 +185,8 @@
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script>
+    var checkInsData = <%- JSON.stringify(checkInsData) %>;
+
     $(document).ready(function() {
       $('#checkInsTable').DataTable();
     });
