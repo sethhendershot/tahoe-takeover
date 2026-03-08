@@ -585,6 +585,40 @@ app.post('/update-check-in', upload.array('pictures', 10), async (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/delete-picture', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date, filename } = req.body;
+  const checkInsData = readCheckIns();
+
+  if (!checkInsData[date] || !checkInsData[date].pictures) {
+    return res.status(404).json({ error: 'Check-in or pictures not found' });
+  }
+
+  const pictures = checkInsData[date].pictures;
+  const pictureIndex = pictures.indexOf(filename);
+
+  if (pictureIndex === -1) {
+    return res.status(404).json({ error: 'Picture not found in check-in' });
+  }
+
+  // Remove the picture from the array
+  pictures.splice(pictureIndex, 1);
+
+  // Delete the actual file from the filesystem
+  const filePath = path.join(__dirname, 'public/uploads', filename);
+  if (fs.existsSync(filePath)) {
+    try {
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      // Continue even if file deletion fails
+    }
+  }
+
+  writeCheckIns(checkInsData);
+  res.json({ success: true });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

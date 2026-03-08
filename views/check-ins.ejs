@@ -266,15 +266,44 @@
       const picturesDiv = document.getElementById('modalPictures');
       picturesDiv.innerHTML = '';
       checkIn.pictures.forEach((pic, index) => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.display = 'inline-block';
+        container.style.margin = '5px';
+
         const img = document.createElement('img');
         img.src = '/uploads/' + pic;
         img.alt = 'Check-in picture';
         img.style.width = '100px';
         img.style.height = '100px';
-        img.style.margin = '5px';
         img.style.cursor = 'pointer';
         img.onclick = () => viewImage('/uploads/' + pic, date, index);
-        picturesDiv.appendChild(img);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '×';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '-5px';
+        deleteBtn.style.right = '-5px';
+        deleteBtn.style.background = 'red';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '20px';
+        deleteBtn.style.height = '20px';
+        deleteBtn.style.fontSize = '14px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        deleteBtn.title = 'Delete picture';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // Prevent triggering the image click
+          deletePicture(date, pic);
+        };
+
+        container.appendChild(img);
+        container.appendChild(deleteBtn);
+        picturesDiv.appendChild(container);
       });
 
       var modal = new bootstrap.Modal(document.getElementById('checkInViewModal'));
@@ -337,6 +366,38 @@
       .catch(error => {
         console.error('Error:', error);
         alert('Error updating check-in');
+      });
+    }
+
+    function deletePicture(date, filename) {
+      if (!confirm('Are you sure you want to delete this picture? This action cannot be undone.')) {
+        return;
+      }
+
+      fetch('/delete-picture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'date=' + encodeURIComponent(date) + '&filename=' + encodeURIComponent(filename)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update the local data
+          const checkIn = checkInsData[date];
+          if (checkIn && checkIn.pictures) {
+            checkIn.pictures = checkIn.pictures.filter(pic => pic !== filename);
+          }
+          // Refresh the current modal view
+          viewCheckIn(date);
+        } else {
+          alert('Error deleting picture: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting picture');
       });
     }
   </script>
