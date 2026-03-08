@@ -531,6 +531,60 @@ app.post('/reorder-picture', (req, res) => {
   res.json({ success: true, newOrder: pictures });
 });
 
+app.post('/update-check-in', upload.array('pictures', 10), async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { originalDate, date, weight, waist, hips } = req.body;
+
+  const checkInsData = readCheckIns();
+  if (!checkInsData[originalDate]) {
+    return res.status(404).json({ error: 'Check-in not found' });
+  }
+
+  // Process new uploaded images if any
+  let newPictures = [];
+  if (req.files && req.files.length > 0) {
+    for (const file of req.files) {
+      const inputPath = path.join(__dirname, 'public/uploads', file.filename);
+      const outputPath = inputPath; // Overwrite the original file
+
+      try {
+        await sharp(inputPath)
+          .rotate() // Auto-rotate based on EXIF orientation
+          .resize(800, null, { // Max width 800px, maintain aspect ratio
+            withoutEnlargement: true // Don't enlarge if smaller
+          })
+          .jpeg({ quality: 80 }) // Convert to JPEG with 80% quality for compression
+          .toFile(outputPath + '_temp'); // Save to temp file first
+
+        // Replace original with processed
+        fs.renameSync(outputPath + '_temp', outputPath);
+        newPictures.push(file.filename);
+      } catch (error) {
+        console.error('Error processing image:', error);
+        // If processing fails, still include the original
+        newPictures.push(file.filename);
+      }
+    }
+  }
+
+  // Update the check-in data
+  const updatedCheckIn = {
+    weight: parseFloat(weight),
+    measurements: { waist: parseFloat(waist), hips: parseFloat(hips) },
+    pictures: [...checkInsData[originalDate].pictures, ...newPictures], // Keep existing pictures and add new ones
+    user: req.session.user
+  };
+
+  // If date changed, remove old entry and add new one
+  if (originalDate !== date) {
+    delete checkInsData[originalDate];
+  }
+
+  checkInsData[date] = updatedCheckIn;
+  writeCheckIns(checkInsData);
+  res.json({ success: true });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

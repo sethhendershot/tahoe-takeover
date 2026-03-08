@@ -43,7 +43,7 @@
                     <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; margin-right: 5px; cursor: pointer;" onclick="viewImage('/uploads/<%= pic %>', '<%= date %>', <%= index %>)">
                   <% }); %>
                 </td>
-                <td><button type="button" class="btn btn-primary btn-sm me-2" onclick="viewCheckIn('<%= date %>')">View Check In</button><button type="button" class="btn btn-danger btn-sm" onclick="deleteCheckIn('<%= date %>')">Delete</button></td>
+                <td><button type="button" class="btn btn-warning btn-sm me-2" onclick="editCheckIn('<%= date %>')">Edit</button><button type="button" class="btn btn-primary btn-sm me-2" onclick="viewCheckIn('<%= date %>')">View Check In</button><button type="button" class="btn btn-danger btn-sm" onclick="deleteCheckIn('<%= date %>')">Delete</button></td>
               </tr>
             <% }); %>
           </tbody>
@@ -115,9 +115,50 @@
       </div>
     </div>
   </div>
-  <script>
-    var checkInsData = <%- JSON.stringify(checkInsData) %>;
-  </script>
+
+  <!-- Edit Check In Modal -->
+  <div class="modal fade" id="editCheckInModal" tabindex="-1" aria-labelledby="editCheckInModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCheckInModalLabel">Edit Check In</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editCheckInForm" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="editDate" class="form-label">Date</label>
+              <input type="date" class="form-control" id="editDate" name="date" required>
+            </div>
+            <div class="mb-3">
+              <label for="editWeight" class="form-label">Weight (lbs)</label>
+              <input type="number" step="0.1" class="form-control" id="editWeight" name="weight" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editWaist" class="form-label">Waist (in)</label>
+                <input type="number" step="0.1" class="form-control" id="editWaist" name="waist" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editHips" class="form-label">Glutes (in)</label>
+                <input type="number" step="0.1" class="form-control" id="editHips" name="hips" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Current Pictures</label>
+              <div id="currentPictures" class="d-flex flex-wrap mb-3"></div>
+              <label for="editPictures" class="form-label">Add More Pictures (optional)</label>
+              <input type="file" class="form-control" id="editPictures" name="pictures" multiple accept="image/*">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveCheckInEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script>
@@ -237,28 +278,63 @@
       modal.show();
     }
 
-    function deleteCheckIn(date) {
-      if (confirm('Are you sure you want to delete this check-in? This action cannot be undone.')) {
-        fetch('/delete-check-in', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: 'date=' + encodeURIComponent(date)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            location.reload();
-          } else {
-            alert('Error deleting check-in: ' + (data.error || 'Unknown error'));
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Error deleting check-in');
-        });
-      }
+    function editCheckIn(date) {
+      const checkIn = checkInsData[date];
+      if (!checkIn) return;
+
+      // Store the original date for updating
+      window.editingCheckInDate = date;
+
+      // Populate form fields
+      document.getElementById('editDate').value = date;
+      document.getElementById('editWeight').value = checkIn.weight;
+      document.getElementById('editWaist').value = checkIn.measurements.waist;
+      document.getElementById('editHips').value = checkIn.measurements.hips;
+
+      // Show current pictures
+      const currentPicturesDiv = document.getElementById('currentPictures');
+      currentPicturesDiv.innerHTML = '';
+      checkIn.pictures.forEach((pic, index) => {
+        const img = document.createElement('img');
+        img.src = '/uploads/' + pic;
+        img.alt = 'Check-in picture';
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.margin = '5px';
+        img.style.border = '1px solid #ddd';
+        currentPicturesDiv.appendChild(img);
+      });
+
+      var modal = new bootstrap.Modal(document.getElementById('editCheckInModal'));
+      modal.show();
+    }
+
+    function saveCheckInEdit() {
+      const form = document.getElementById('editCheckInForm');
+      const formData = new FormData(form);
+
+      // Add the original date for updating
+      formData.append('originalDate', window.editingCheckInDate);
+
+      fetch('/update-check-in', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close modal and reload page
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editCheckInModal'));
+          modal.hide();
+          location.reload();
+        } else {
+          alert('Error updating check-in: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating check-in');
+      });
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
