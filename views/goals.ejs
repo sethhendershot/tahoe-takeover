@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goals</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-light">
+  <%- include('menu') %>
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h1><i class="fas fa-bullseye"></i> Goals</h1>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">Set your fitness goals and track your progress towards them.</p>
+        <form id="goalsForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="targetWeight" class="form-label">Target Weight (lbs)</label>
+              <input type="number" step="0.1" class="form-control" id="targetWeight" name="targetWeight" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="targetDate" class="form-label">Target Date</label>
+              <input type="date" class="form-control" id="targetDate" name="targetDate" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="targetWaist" class="form-label">Target Waist (in)</label>
+              <input type="number" step="0.1" class="form-control" id="targetWaist" name="targetWaist" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="targetGlutes" class="form-label">Target Glutes (in)</label>
+              <input type="number" step="0.1" class="form-control" id="targetGlutes" name="targetGlutes" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Goals</button>
+        </form>
+        <div id="currentGoals" class="mt-4" style="display: none;">
+          <h3>Current Goals</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Target Weight:</strong> <span id="currentWeight"></span> lbs
+            </div>
+            <div class="col-md-6">
+              <strong>Target Date:</strong> <span id="currentDate"></span>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <strong>Target Waist:</strong> <span id="currentWaist"></span> in
+            </div>
+            <div class="col-md-6">
+              <strong>Target Glutes:</strong> <span id="currentGlutes"></span> in
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadGoals();
+
+      document.getElementById('goalsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+
+        fetch('/goals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(() => {
+          loadGoals();
+          alert('Goals saved successfully!');
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error saving goals');
+        });
+      });
+    });
+
+    function loadGoals() {
+      fetch('/load-goals')
+        .then(res => res.json())
+        .then(data => {
+          if (data.targetWeight) {
+            document.getElementById('currentWeight').textContent = data.targetWeight;
+            document.getElementById('currentDate').textContent = data.targetDate;
+            document.getElementById('currentWaist').textContent = data.targetWaist;
+            document.getElementById('currentGlutes').textContent = data.targetGlutes;
+            document.getElementById('currentGoals').style.display = 'block';
+
+            // Populate form with current values
+            document.getElementById('targetWeight').value = data.targetWeight;
+            document.getElementById('targetDate').value = data.targetDate;
+            document.getElementById('targetWaist').value = data.targetWaist;
+            document.getElementById('targetGlutes').value = data.targetGlutes;
+          } else {
+            document.getElementById('currentGoals').style.display = 'none';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading goals:', error);
+        });
+    }
+  </script>
+</body>
+</html>

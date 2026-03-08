@@ -24,6 +24,7 @@ const dataPath = path.join(__dirname, 'meal-options.json');
 const mealsPath = path.join(__dirname, 'meals.json');
 const guidePath = path.join(__dirname, 'meal-guide.json');
 const checkInsPath = path.join(__dirname, 'check-ins.json');
+const goalsPath = path.join(__dirname, 'goals.json');
 
 // Helper functions
 function readData() {
@@ -76,6 +77,19 @@ function readCheckIns() {
 
 function writeCheckIns(data) {
   fs.writeFileSync(checkInsPath, JSON.stringify(data, null, 2));
+}
+
+function readGoals() {
+  try {
+    const data = fs.readFileSync(goalsPath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return {};
+  }
+}
+
+function writeGoals(data) {
+  fs.writeFileSync(goalsPath, JSON.stringify(data, null, 2));
 }
 
 // Middleware
@@ -435,6 +449,30 @@ app.get('/check-ins', (req, res) => {
 app.get('/statistics', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   res.render('statistics', { user: req.session.user });
+});
+
+app.get('/goals', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('goals', { user: req.session.user });
+});
+
+app.get('/load-goals', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const goalsData = readGoals();
+  res.json(goalsData);
+});
+
+app.post('/goals', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { targetWeight, targetDate, targetWaist, targetGlutes } = req.body;
+  const goalsData = {
+    targetWeight: parseFloat(targetWeight),
+    targetDate,
+    targetWaist: parseFloat(targetWaist),
+    targetGlutes: parseFloat(targetGlutes)
+  };
+  writeGoals(goalsData);
+  res.json({ success: true });
 });
 
 app.post('/add-check-in', upload.array('pictures', 10), async (req, res) => {
