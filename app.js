@@ -4,6 +4,7 @@ const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -431,15 +432,40 @@ app.get('/check-ins', (req, res) => {
   res.render('check-ins', { checkInsData, user: req.session.user });
 });
 
-app.post('/add-check-in', upload.array('pictures', 10), (req, res) => {
+app.post('/add-check-in', upload.array('pictures', 10), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const { date, weight, waist, hips } = req.body;
-  const pictures = req.files.map(file => file.filename);
+
+  // Process uploaded images
+  const processedPictures = [];
+  for (const file of req.files) {
+    const inputPath = path.join(__dirname, 'public/uploads', file.filename);
+    const outputPath = inputPath; // Overwrite the original file
+
+    try {
+      await sharp(inputPath)
+        .rotate() // Auto-rotate based on EXIF orientation
+        .resize(800, null, { // Max width 800px, maintain aspect ratio
+          withoutEnlargement: true // Don't enlarge if smaller
+        })
+        .jpeg({ quality: 80 }) // Convert to JPEG with 80% quality for compression
+        .toFile(outputPath + '_temp'); // Save to temp file first
+
+      // Replace original with processed
+      fs.renameSync(outputPath + '_temp', outputPath);
+      processedPictures.push(file.filename);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      // If processing fails, still include the original
+      processedPictures.push(file.filename);
+    }
+  }
+
   const checkInsData = readCheckIns();
   checkInsData[date] = {
     weight: parseFloat(weight),
     measurements: { waist: parseFloat(waist), hips: parseFloat(hips) },
-    pictures: pictures,
+    pictures: processedPictures,
     user: req.session.user
   };
   writeCheckIns(checkInsData);
@@ -473,9 +499,36 @@ app.post('/delete-check-in', (req, res) => {
   }
 });
 
-app.get('/statistics', (req, res) => {
-  if (!req.session.user) return res.redirect('/');
-  res.render('statistics', { user: req.session.user });
+app.post('/reorder-picture', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date, filename, direction } = req.body;
+  const checkInsData = readCheckIns();
+
+  if (!checkInsData[date] || !checkInsData[date].pictures) {
+    return res.status(404).json({ error: 'Check-in or pictures not found' });
+  }
+
+  const pictures = checkInsData[date].pictures;
+  const currentIndex = pictures.indexOf(filename);
+
+  if (currentIndex === -1) {
+    return res.status(404).json({ error: 'Picture not found in check-in' });
+  }
+
+  let newIndex;
+  if (direction === 'left' && currentIndex > 0) {
+    newIndex = currentIndex - 1;
+  } else if (direction === 'right' && currentIndex < pictures.length - 1) {
+    newIndex = currentIndex + 1;
+  } else {
+    return res.status(400).json({ error: 'Cannot move picture in that direction' });
+  }
+
+  // Swap positions
+  [pictures[currentIndex], pictures[newIndex]] = [pictures[newIndex], pictures[currentIndex]];
+
+  writeCheckIns(checkInsData);
+  res.json({ success: true, newOrder: pictures });
 });
 
 const PORT = process.env.PORT || 3000;
