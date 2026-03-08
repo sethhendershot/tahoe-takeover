@@ -278,20 +278,7 @@ app.get('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const data = readData();
   const selectedDate = req.query.date || new Date().toISOString().split('T')[0];
-  const mealsData = readMeals();
-  let dayPlan = null;
-  if (mealsData[selectedDate] && mealsData[selectedDate].type === 'not-training') {
-    dayPlan = { meals: [] };
-    for (let i = 1; i <= 5; i++) {
-      const meal = mealsData[selectedDate].meals[i] || {};
-      dayPlan.meals.push({
-        protein: { amount: meal.protein || 0, mealId: meal.proteinMealId || '' },
-        carbs: { amount: meal.carbs || 0, mealId: meal.carbsMealId || '' },
-        fats: { amount: meal.fats || 0, mealId: meal.fatsMealId || '' }
-      });
-    }
-  }
-  res.render('not-training-day', { meals: data.meals, dayPlan, selectedDate, guide: readGuide()['non-training'] });
+  res.render('not-training-day', { meals: data.meals, selectedDate, guide: readGuide()['non-training'] });
 });
 
 app.get('/load-meals', (req, res) => {
@@ -340,7 +327,7 @@ app.post('/training-day', (req, res) => {
 app.post('/not-training-day', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const mealsData = readMeals();
-  const date = req.body.date || new Date().toISOString().split('T')[0];
+  const { date, meal, action, protein, carbs, fats, proteinMealId, carbsMealId, fatsMealId } = req.body;
   if (!mealsData[date]) {
     mealsData[date] = { type: 'not-training', user: req.session.user, meals: {} };
   } else if (!mealsData[date].meals) {
@@ -348,18 +335,28 @@ app.post('/not-training-day', (req, res) => {
   }
   mealsData[date].type = 'not-training';
   mealsData[date].user = req.session.user;
-  for (let i = 1; i <= 5; i++) {
-    mealsData[date].meals[i] = {
-      protein: parseFloat(req.body['protein' + i]) || 0,
-      carbs: parseFloat(req.body['carbs' + i]) || 0,
-      fats: parseFloat(req.body['fats' + i]) || 0,
-      proteinMealId: req.body['proteinMeal' + i],
-      carbsMealId: req.body['carbsMeal' + i],
-      fatsMealId: req.body['fatsMeal' + i]
+  const mealNum = parseInt(meal);
+  if (action === 'unlog') {
+    mealsData[date].meals[mealNum] = {
+      protein: 0,
+      carbs: 0,
+      fats: 0,
+      proteinMealId: '',
+      carbsMealId: '',
+      fatsMealId: ''
+    };
+  } else {
+    mealsData[date].meals[mealNum] = {
+      protein: parseFloat(protein) || 0,
+      carbs: parseFloat(carbs) || 0,
+      fats: parseFloat(fats) || 0,
+      proteinMealId: proteinMealId || '',
+      carbsMealId: carbsMealId || '',
+      fatsMealId: fatsMealId || ''
     };
   }
   writeMeals(mealsData);
-  res.redirect('/day-plans');
+  res.json({ success: true });
 });
 
 app.get('/day-plans', (req, res) => {
