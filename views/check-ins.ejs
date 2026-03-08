@@ -24,11 +24,8 @@
             <tr>
               <th>Date</th>
               <th>Weight (lbs)</th>
-              <th>Hips (in)</th>
               <th>Waist (in)</th>
-              <th>Chest (in)</th>
-              <th>Arms (in)</th>
-              <th>Thighs (in)</th>
+              <th>Glutes (in)</th>
               <th>Pictures</th>
               <th>Actions</th>
             </tr>
@@ -39,11 +36,8 @@
               <tr>
                 <td><%= date %></td>
                 <td><%= checkIn.weight %></td>
-                <td><%= checkIn.measurements.hips %></td>
                 <td><%= checkIn.measurements.waist %></td>
-                <td><%= checkIn.measurements.chest %></td>
-                <td><%= checkIn.measurements.arms %></td>
-                <td><%= checkIn.measurements.thighs %></td>
+                <td><%= checkIn.measurements.hips %></td>
                 <td>
                   <% checkIn.pictures.forEach(pic => { %>
                     <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; margin-right: 5px; cursor: pointer;" onclick="viewImage('/uploads/<%= pic %>')">
@@ -94,20 +88,11 @@
           </div>
           <h6>Measurements</h6>
           <div class="row">
-            <div class="col-md-4">
-              <strong>Hips:</strong> <span id="modalHips"></span> in
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
               <strong>Waist:</strong> <span id="modalWaist"></span> in
             </div>
-            <div class="col-md-4">
-              <strong>Chest:</strong> <span id="modalChest"></span> in
-            </div>
-            <div class="col-md-4">
-              <strong>Arms:</strong> <span id="modalArms"></span> in
-            </div>
-            <div class="col-md-4">
-              <strong>Thighs:</strong> <span id="modalThighs"></span> in
+            <div class="col-md-6">
+              <strong>Glutes:</strong> <span id="modalHips"></span> in
             </div>
           </div>
           <h6>Pictures</h6>
@@ -139,11 +124,8 @@
       document.getElementById('modalDate').textContent = date;
       document.getElementById('modalWeight').textContent = checkIn.weight + ' lbs';
       document.getElementById('modalUser').textContent = checkIn.user;
-      document.getElementById('modalHips').textContent = checkIn.measurements.hips;
       document.getElementById('modalWaist').textContent = checkIn.measurements.waist;
-      document.getElementById('modalChest').textContent = checkIn.measurements.chest;
-      document.getElementById('modalArms').textContent = checkIn.measurements.arms;
-      document.getElementById('modalThighs').textContent = checkIn.measurements.thighs;
+      document.getElementById('modalHips').textContent = checkIn.measurements.hips;
 
       const picturesDiv = document.getElementById('modalPictures');
       picturesDiv.innerHTML = '';

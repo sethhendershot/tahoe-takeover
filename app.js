@@ -433,12 +433,12 @@ app.get('/check-ins', (req, res) => {
 
 app.post('/add-check-in', upload.array('pictures', 10), (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
-  const { date, weight, hips, waist, chest, arms, thighs } = req.body; // Add more measurements as needed
+  const { date, weight, waist, hips } = req.body;
   const pictures = req.files.map(file => file.filename);
   const checkInsData = readCheckIns();
   checkInsData[date] = {
     weight: parseFloat(weight),
-    measurements: { hips: parseFloat(hips), waist: parseFloat(waist), chest: parseFloat(chest), arms: parseFloat(arms), thighs: parseFloat(thighs) },
+    measurements: { waist: parseFloat(waist), hips: parseFloat(hips) },
     pictures: pictures,
     user: req.session.user
   };
