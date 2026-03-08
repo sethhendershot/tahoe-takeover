@@ -432,6 +432,11 @@ app.get('/check-ins', (req, res) => {
   res.render('check-ins', { checkInsData, user: req.session.user });
 });
 
+app.get('/statistics', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('statistics', { user: req.session.user });
+});
+
 app.post('/add-check-in', upload.array('pictures', 10), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const { date, weight, waist, hips } = req.body;
