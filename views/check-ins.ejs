@@ -49,7 +49,7 @@
                     <img src="/uploads/<%= pic %>" alt="Check-in picture" style="width: 50px; height: 50px; margin-right: 5px; cursor: pointer;" onclick="viewImage('/uploads/<%= pic %>')">
                   <% }); %>
                 </td>
-                <td><button type="button" class="btn btn-primary btn-sm" onclick="viewCheckIn('<%= date %>')">View Check In</button></td>
+                <td><button type="button" class="btn btn-primary btn-sm me-2" onclick="viewCheckIn('<%= date %>')">View Check In</button><button type="button" class="btn btn-danger btn-sm" onclick="deleteCheckIn('<%= date %>')">Delete</button></td>
               </tr>
             <% }); %>
           </tbody>
@@ -161,6 +161,30 @@
 
       var modal = new bootstrap.Modal(document.getElementById('checkInViewModal'));
       modal.show();
+    }
+
+    function deleteCheckIn(date) {
+      if (confirm('Are you sure you want to delete this check-in? This action cannot be undone.')) {
+        fetch('/delete-check-in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'date=' + encodeURIComponent(date)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error deleting check-in: ' + (data.error || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error deleting check-in');
+        });
+      }
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

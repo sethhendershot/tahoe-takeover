@@ -451,6 +451,28 @@ app.get('/create-check-in', (req, res) => {
   res.render('create-check-in');
 });
 
+app.post('/delete-check-in', (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { date } = req.body;
+  const checkInsData = readCheckIns();
+  if (checkInsData[date]) {
+    // Optionally delete associated pictures from filesystem
+    if (checkInsData[date].pictures) {
+      checkInsData[date].pictures.forEach(pic => {
+        const picPath = path.join(__dirname, 'public/uploads', pic);
+        if (fs.existsSync(picPath)) {
+          fs.unlinkSync(picPath);
+        }
+      });
+    }
+    delete checkInsData[date];
+    writeCheckIns(checkInsData);
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Check-in not found' });
+  }
+});
+
 app.get('/statistics', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   res.render('statistics', { user: req.session.user });
