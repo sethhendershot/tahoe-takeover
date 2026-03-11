@@ -27,7 +27,7 @@
           <% if (goals && goals.targetDate) { %>
             <div class="alert alert-info mb-3">
               <h6><i class="fas fa-calendar-alt"></i> Goal Countdown</h6>
-              <p class="mb-1">Target Date: <strong><%= new Date(goals.targetDate).toLocaleDateString() %></strong></p>
+              <p class="mb-1">Target Date: <strong id="targetDateDisplay"></strong></p>
               <p class="mb-0" id="countdown"></p>
             </div>
           <% } %>
@@ -93,6 +93,10 @@
         // Parse date string as local date to avoid timezone issues
         const dateParts = '<%= goals.targetDate %>'.split('-');
         const targetDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        
+        // Display the target date correctly
+        document.getElementById('targetDateDisplay').textContent = targetDate.toLocaleDateString();
+        
         const now = new Date();
         const timeDiff = targetDate - now;
         
