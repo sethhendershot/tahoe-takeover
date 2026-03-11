@@ -34,15 +34,16 @@
             <% if (isAdmin) { %>
               <button id="add-non-training" class="btn btn-primary mb-3">Add Meal</button>
             <% } %>
-            <table id="non-training-table" class="display table table-striped">
-              <thead>
-                <tr>
-                  <th>Meal</th>
-                  <th>Protein (g)</th>
-                  <th>Carb (g)</th>
-                  <th>Fats (g)</th>
-                  <th>Note</th>
-                  <% if (isAdmin) { %>
+            <div class="table-responsive">
+              <table id="non-training-table" class="display table table-striped">
+                <thead>
+                  <tr>
+                    <th>Meal</th>
+                    <th>Protein (g)</th>
+                    <th>Carb (g)</th>
+                    <th>Fats (g)</th>
+                    <th>Note</th>
+                    <% if (isAdmin) { %>
                     <th>Actions</th>
                   <% } %>
                 </tr>
@@ -65,13 +66,15 @@
                 <% }); %>
               </tbody>
             </table>
+            </div>
           </div>
           <div class="tab-pane fade" id="training" role="tabpanel">
             <% if (isAdmin) { %>
               <button id="add-training" class="btn btn-primary mb-3">Add Meal</button>
             <% } %>
-            <table id="training-table" class="display table table-striped">
-              <thead>
+            <div class="table-responsive">
+              <table id="training-table" class="display table table-striped">
+                <thead>
                 <tr>
                   <th>Meal</th>
                   <th>Protein (g)</th>
@@ -101,13 +104,15 @@
                 <% }); %>
               </tbody>
             </table>
+            </div>
           </div>
           <div class="tab-pane fade" id="check-in" role="tabpanel">
             <% if (isAdmin) { %>
               <button id="add-check-in" class="btn btn-primary mb-3">Add Meal</button>
             <% } %>
-            <table id="check-in-table" class="display table table-striped">
-              <thead>
+            <div class="table-responsive">
+              <table id="check-in-table" class="display table table-striped">
+                <thead>
                 <tr>
                   <th>Meal</th>
                   <th>Protein (g)</th>
@@ -137,6 +142,7 @@
                 <% }); %>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>

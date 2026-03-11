@@ -1,31 +1,36 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
       <a class="navbar-brand" href="/"><i class="fas fa-calendar"></i> Prep Planner</a>
-      <div class="navbar-nav ms-auto">
-        <div class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" id="mealsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Meals
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="mealsDropdown">
-            <li><a class="dropdown-item" href="/schedule-meals">Schedule</a></li>
-            <li><a class="dropdown-item" href="/meal-options">Options</a></li>
-            <li><a class="dropdown-item" href="/meal-guide">Guidance</a></li>
-            <li><a class="dropdown-item" href="/meals-list">Logged (By Date)</a></li>
-          </ul>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav ms-auto">
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="mealsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Meals
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="mealsDropdown">
+              <li><a class="dropdown-item" href="/schedule-meals">Schedule</a></li>
+              <li><a class="dropdown-item" href="/meal-options">Options</a></li>
+              <li><a class="dropdown-item" href="/meal-guide">Guidance</a></li>
+              <li><a class="dropdown-item" href="/meals-list">Logged (By Date)</a></li>
+            </ul>
+          </div>
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="progressDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Progress
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="progressDropdown">
+              <li><a class="dropdown-item" href="/check-ins">Check ins</a></li>
+              <li><a class="dropdown-item" href="/statistics">Statistics</a></li>
+              <li><a class="dropdown-item" href="/goals">Goals</a></li>
+            </ul>
+          </div>
+          <form class="d-inline" action="/logout" method="POST">
+            <button class="btn btn-link nav-link" type="submit">Logout</button>
+          </form>
         </div>
-        <div class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" id="progressDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Progress
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="progressDropdown">
-            <li><a class="dropdown-item" href="/check-ins">Check ins</a></li>
-            <li><a class="dropdown-item" href="/statistics">Statistics</a></li>
-            <li><a class="dropdown-item" href="/goals">Goals</a></li>
-          </ul>
-        </div>
-        <form class="d-inline" action="/logout" method="POST">
-          <button class="btn btn-link nav-link" type="submit">Logout</button>
-        </form>
       </div>
     </div>
   </nav>
