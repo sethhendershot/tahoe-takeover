@@ -90,7 +90,9 @@
 
     function updateCountdown() {
       <% if (goals && goals.targetDate) { %>
-        const targetDate = new Date('<%= goals.targetDate %>');
+        // Parse date string as local date to avoid timezone issues
+        const dateParts = '<%= goals.targetDate %>'.split('-');
+        const targetDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
         const now = new Date();
         const timeDiff = targetDate - now;
         
