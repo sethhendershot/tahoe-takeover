@@ -106,8 +106,36 @@ app.use(session({
 
 // Routes
 app.get('/', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
   const goalsData = readGoals();
   res.render('home', { user: req.session.user, goals: goalsData });
+});
+
+app.get('/login', (req, res) => {
+  // Check if required JSON files exist
+  const fs = require('fs');
+  const path = require('path');
+  
+  const requiredFiles = [
+    path.join(__dirname, 'check-ins.json'),
+    path.join(__dirname, 'meals.json'),
+    path.join(__dirname, 'goals.json'),
+    path.join(__dirname, 'meal-options.json'),
+    path.join(__dirname, 'meal-guide.json')
+  ];
+  
+  const missingFiles = requiredFiles.filter(file => !fs.existsSync(file));
+  
+  if (missingFiles.length > 0) {
+    return res.render('setup', { 
+      missingFiles: missingFiles.map(f => path.basename(f)),
+      user: req.session.user 
+    });
+  }
+  
+  res.render('login', { user: req.session.user });
 });
 
 app.post('/login', (req, res) => {
