@@ -662,6 +662,40 @@ app.post('/delete-picture', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/rotate-image', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
+  const { filename, direction } = req.body;
+
+  const filePath = path.join(__dirname, 'public/uploads', filename);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Image file not found' });
+  }
+
+  try {
+    let rotateAngle = 0;
+    if (direction === 'left') {
+      rotateAngle = -90;
+    } else if (direction === 'right') {
+      rotateAngle = 90;
+    } else {
+      return res.status(400).json({ error: 'Invalid direction' });
+    }
+
+    await sharp(filePath)
+      .rotate(rotateAngle)
+      .jpeg({ quality: 80 })
+      .toFile(filePath + '_temp');
+
+    // Replace original with rotated
+    fs.renameSync(filePath + '_temp', filePath);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error rotating image:', error);
+    res.status(500).json({ error: 'Failed to rotate image' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
