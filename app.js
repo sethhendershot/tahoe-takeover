@@ -106,7 +106,8 @@ app.use(session({
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('home', { user: req.session.user });
+  const goalsData = readGoals();
+  res.render('home', { user: req.session.user, goals: goalsData });
 });
 
 app.post('/login', (req, res) => {
