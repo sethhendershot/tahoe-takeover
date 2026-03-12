@@ -506,7 +506,7 @@ app.post('/goals', (req, res) => {
 
 app.post('/add-check-in', upload.array('pictures', 10), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
-  const { date, weight, waist, hips } = req.body;
+  const { date, weight, waist, hips, notes } = req.body;
 
   // Process uploaded images
   const processedPictures = [];
@@ -538,6 +538,7 @@ app.post('/add-check-in', upload.array('pictures', 10), async (req, res) => {
     weight: parseFloat(weight),
     measurements: { waist: parseFloat(waist), hips: parseFloat(hips) },
     pictures: processedPictures,
+    notes: notes || '',
     user: req.session.user
   };
   writeCheckIns(checkInsData);
@@ -605,7 +606,7 @@ app.post('/reorder-picture', (req, res) => {
 
 app.post('/update-check-in', upload.array('pictures', 10), async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
-  const { originalDate, date, weight, waist, hips } = req.body;
+  const { originalDate, date, weight, waist, hips, notes } = req.body;
 
   const checkInsData = readCheckIns();
   if (!checkInsData[originalDate]) {
@@ -644,6 +645,7 @@ app.post('/update-check-in', upload.array('pictures', 10), async (req, res) => {
     weight: parseFloat(weight),
     measurements: { waist: parseFloat(waist), hips: parseFloat(hips) },
     pictures: [...checkInsData[originalDate].pictures, ...newPictures], // Keep existing pictures and add new ones
+    notes: notes || '',
     user: req.session.user
   };
 

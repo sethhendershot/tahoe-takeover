@@ -31,6 +31,7 @@
                 <th>Waist (in)</th>
                 <th>Glutes (in)</th>
                 <th>Pictures</th>
+                <th>Notes</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -50,6 +51,7 @@
                       </div>
                     <% }); %>
                   </td>
+                  <td><%= (checkIn.notes || '').substring(0, 50) + ((checkIn.notes || '').length > 50 ? '...' : '') %></td>
                   <td><button type="button" class="btn btn-warning btn-sm me-2" onclick="editCheckIn('<%= date %>')">Edit</button><button type="button" class="btn btn-primary btn-sm me-2" onclick="viewCheckIn('<%= date %>')">View Check In</button><button type="button" class="btn btn-danger btn-sm" onclick="deleteCheckIn('<%= date %>')">Delete</button></td>
                 </tr>
               <% }); %>
@@ -119,6 +121,8 @@
           </div>
           <h6>Pictures</h6>
           <div id="modalPictures" class="d-flex flex-wrap"></div>
+          <h6>Notes</h6>
+          <p id="modalNotes"></p>
         </div>
       </div>
     </div>
@@ -158,6 +162,10 @@
               <label for="editPictures" class="form-label">Add More Pictures (optional)</label>
               <input type="file" class="form-control" id="editPictures" name="pictures" multiple accept="image/*">
             </div>
+            <div class="mb-3">
+              <label for="editNotes" class="form-label">Notes</label>
+              <textarea class="form-control" id="editNotes" name="notes" rows="3"></textarea>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -177,6 +185,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <div class="mb-3">
+            <label for="sizeSlider" class="form-label">Picture Size</label>
+            <input type="range" class="form-range" id="sizeSlider" min="100" max="800" value="300">
+          </div>
           <div id="compareContainer" class="d-flex flex-wrap justify-content-center gap-1">
             <!-- Pictures will be added here dynamically -->
           </div>
@@ -288,6 +300,8 @@
       document.getElementById('modalWaist').textContent = checkIn.measurements.waist;
       document.getElementById('modalHips').textContent = checkIn.measurements.hips;
 
+      document.getElementById('modalNotes').textContent = checkIn.notes || '';
+
       const picturesDiv = document.getElementById('modalPictures');
       picturesDiv.innerHTML = '';
       checkIn.pictures.forEach((pic, index) => {
@@ -347,19 +361,51 @@
       document.getElementById('editWeight').value = checkIn.weight;
       document.getElementById('editWaist').value = checkIn.measurements.waist;
       document.getElementById('editHips').value = checkIn.measurements.hips;
+      document.getElementById('editNotes').value = checkIn.notes || '';
 
       // Show current pictures
       const currentPicturesDiv = document.getElementById('currentPictures');
       currentPicturesDiv.innerHTML = '';
       checkIn.pictures.forEach((pic, index) => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.display = 'inline-block';
+        container.style.margin = '5px';
+
         const img = document.createElement('img');
         img.src = '/uploads/' + pic;
         img.alt = 'Check-in picture';
         img.style.width = '80px';
         img.style.height = '80px';
-        img.style.margin = '5px';
         img.style.border = '1px solid #ddd';
-        currentPicturesDiv.appendChild(img);
+        img.style.cursor = 'pointer';
+        img.onclick = () => viewImage('/uploads/' + pic, date, index);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '×';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '-5px';
+        deleteBtn.style.right = '-5px';
+        deleteBtn.style.background = 'red';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '20px';
+        deleteBtn.style.height = '20px';
+        deleteBtn.style.fontSize = '14px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        deleteBtn.title = 'Delete picture';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // Prevent triggering the image click
+          deletePicture(date, pic);
+        };
+
+        container.appendChild(img);
+        container.appendChild(deleteBtn);
+        currentPicturesDiv.appendChild(container);
       });
 
       var modal = new bootstrap.Modal(document.getElementById('editCheckInModal'));
@@ -540,6 +586,16 @@
         imgContainer.appendChild(buttonContainer);
         compareContainer.appendChild(imgContainer);
       });
+
+      // Set up size slider
+      const sizeSlider = document.getElementById('sizeSlider');
+      sizeSlider.oninput = function() {
+        const size = this.value + 'px';
+        const imgs = compareContainer.querySelectorAll('img');
+        imgs.forEach(img => img.style.maxHeight = size);
+      };
+      // Set initial size
+      sizeSlider.oninput();
 
       if (!compareModalInstance) {
         compareModalInstance = new bootstrap.Modal(document.getElementById('compareModal'));

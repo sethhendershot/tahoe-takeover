@@ -25,9 +25,6 @@
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab">Training Day</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="check-in-tab" data-bs-toggle="tab" data-bs-target="#check-in" type="button" role="tab">Check-in Day</button>
-          </li>
         </ul>
         <div class="tab-content" id="dayTabsContent">
           <div class="tab-pane fade show active" id="non-training" role="tabpanel">
@@ -106,44 +103,6 @@
             </table>
             </div>
           </div>
-          <div class="tab-pane fade" id="check-in" role="tabpanel">
-            <% if (isAdmin) { %>
-              <button id="add-check-in" class="btn btn-primary mb-3">Add Meal</button>
-            <% } %>
-            <div class="table-responsive">
-              <table id="check-in-table" class="display table table-striped">
-                <thead>
-                <tr>
-                  <th>Meal</th>
-                  <th>Protein (g)</th>
-                  <th>Carb (g)</th>
-                  <th>Fats (g)</th>
-                  <th>Note</th>
-                  <% if (isAdmin) { %>
-                    <th>Actions</th>
-                  <% } %>
-                </tr>
-              </thead>
-              <tbody>
-                <% guide['check-in'].forEach(m => { %>
-                  <tr>
-                    <td><%= m.meal %></td>
-                    <td><%= m.protein %></td>
-                    <td><%= m.carb %></td>
-                    <td><%= m.fats %></td>
-                    <td><%= m.note %></td>
-                    <% if (isAdmin) { %>
-                      <td>
-                        <button class="btn btn-sm btn-warning edit-btn" data-day="check-in" data-meal="<%= m.meal %>" data-protein="<%= m.protein %>" data-carb="<%= m.carb %>" data-fats="<%= m.fats %>" data-note="<%= m.note %>">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn" data-day="check-in" data-meal="<%= m.meal %>">Delete</button>
-                      </td>
-                    <% } %>
-                  </tr>
-                <% }); %>
-              </tbody>
-            </table>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -199,12 +158,10 @@
     $(document).ready(function() {
       $('#non-training-table').DataTable();
       $('#training-table').DataTable();
-      $('#check-in-table').DataTable();
 
       <% if (isAdmin) { %>
         $('#add-non-training').click(() => openModal('add', 'non-training'));
         $('#add-training').click(() => openModal('add', 'training'));
-        $('#add-check-in').click(() => openModal('add', 'check-in'));
 
         $(document).on('click', '.edit-btn', function() {
           const day = $(this).data('day');

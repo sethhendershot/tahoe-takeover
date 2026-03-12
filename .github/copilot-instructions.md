@@ -84,3 +84,5 @@ Before starting a new task in the above plan, update progress in the plan.
 - Work through each checklist item systematically.
 - Keep communication concise and focused.
 - Follow development best practices.
+- Push to the main branch after completing each step, ensuring that the project is well-documented and that the user has clear instructions for running and debugging the project.
+- Don't launch the app, the user will launch it

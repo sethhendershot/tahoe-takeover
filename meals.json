@@ -181,5 +181,19 @@
         "fatsMealId": ""
       }
     }
+  },
+  "2026-03-12": {
+    "type": "training",
+    "user": "admin",
+    "meals": {
+      "1": {
+        "protein": 0,
+        "carbs": 0,
+        "fats": 0,
+        "proteinMealId": "",
+        "carbsMealId": "",
+        "fatsMealId": ""
+      }
+    }
   }
 }

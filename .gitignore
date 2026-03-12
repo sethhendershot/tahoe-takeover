@@ -1,3 +1,8 @@
 node_modules/
 .env
 *.log
+check-ins.json
+goals.json
+meal-guide.json
+meal-options.json
+meals.json
