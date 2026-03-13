@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
+const archiver = require('archiver');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -485,6 +486,11 @@ app.get('/goals', (req, res) => {
   res.render('goals', { user: req.session.user });
 });
 
+app.get('/settings', (req, res) => {
+  if (!req.session.user) return res.redirect('/');
+  res.render('settings', { user: req.session.user });
+});
+
 app.get('/load-goals', (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Not logged in' });
   const goalsData = readGoals();
@@ -730,4 +736,51 @@ app.post('/rotate-image', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Export routes
+app.get('/export/meals.json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="meals.json"');
+  res.send(JSON.stringify(readMeals(), null, 2));
+});
+
+app.get('/export/meal-options.json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="meal-options.json"');
+  res.send(JSON.stringify(readData(), null, 2));
+});
+
+app.get('/export/meal-guide.json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="meal-guide.json"');
+  res.send(JSON.stringify(readGuide(), null, 2));
+});
+
+app.get('/export/goals.json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="goals.json"');
+  res.send(JSON.stringify(readGoals(), null, 2));
+});
+
+app.get('/export/check-ins.json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="check-ins.json"');
+  res.send(JSON.stringify(readCheckIns(), null, 2));
+});
+
+app.get('/export/pictures.zip', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  const uploadsPath = path.join(__dirname, 'public', 'uploads');
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="pictures.zip"');
+  archive.pipe(res);
+  archive.directory(uploadsPath, 'pictures');
+  archive.finalize();
 });
