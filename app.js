@@ -488,7 +488,8 @@ app.get('/goals', (req, res) => {
 
 app.get('/settings', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  res.render('settings', { user: req.session.user });
+  const checkInsData = readCheckIns();
+  res.render('settings', { user: req.session.user, checkInsData });
 });
 
 app.get('/load-goals', (req, res) => {
@@ -782,5 +783,28 @@ app.get('/export/pictures.zip', (req, res) => {
   res.setHeader('Content-Disposition', 'attachment; filename="pictures.zip"');
   archive.pipe(res);
   archive.directory(uploadsPath, 'pictures');
+  archive.finalize();
+});
+
+app.post('/export/selected-pictures', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  let { dates } = req.body;
+  if (!dates) return res.status(400).send('No dates selected');
+  if (!Array.isArray(dates)) dates = [dates];
+  const checkInsData = readCheckIns();
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="selected-pictures.zip"');
+  archive.pipe(res);
+  dates.forEach(date => {
+    if (checkInsData[date] && checkInsData[date].pictures) {
+      checkInsData[date].pictures.forEach(pic => {
+        const picPath = path.join(__dirname, 'public', 'uploads', pic);
+        if (fs.existsSync(picPath)) {
+          archive.file(picPath, { name: `${date}/${pic}` });
+        }
+      });
+    }
+  });
   archive.finalize();
 });

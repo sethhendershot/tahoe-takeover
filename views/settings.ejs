@@ -20,7 +20,7 @@
         <h3>Export Data</h3>
         <p>Download your data files:</p>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <h5>JSON Files</h5>
             <ul class="list-group mb-3">
               <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -45,10 +45,27 @@
               </li>
             </ul>
           </div>
-          <div class="col-md-6">
-            <h5>Uploaded Pictures</h5>
+          <div class="col-md-4">
+            <h5>All Uploaded Pictures</h5>
             <p>Download all uploaded pictures as a ZIP file.</p>
-            <a href="/export/pictures.zip" class="btn btn-success" download>Download Pictures ZIP</a>
+            <a href="/export/pictures.zip" class="btn btn-success" download>Download All Pictures ZIP</a>
+          </div>
+          <div class="col-md-4">
+            <h5>Selective Pictures Export</h5>
+            <p>Select check-ins to export their pictures:</p>
+            <form action="/export/selected-pictures" method="POST">
+              <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
+                <% if (checkInsData[date].pictures && checkInsData[date].pictures.length > 0) { %>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="dates" value="<%= date %>" id="check-<%= date %>">
+                    <label class="form-check-label" for="check-<%= date %>">
+                      <%= date %> (<%= checkInsData[date].pictures.length %> picture<%= checkInsData[date].pictures.length > 1 ? 's' : '' %>)
+                    </label>
+                  </div>
+                <% } %>
+              <% }); %>
+              <button type="submit" class="btn btn-warning mt-3">Download Selected Pictures ZIP</button>
+            </form>
           </div>
         </div>
       </div>
