@@ -157,12 +157,14 @@
             statusEl.className = 'badge bg-warning';
             btnEl.textContent = 'Re-log Meal';
             actionEl.value = 'log';
+            divEl.classList.remove('logged');
             divEl.classList.add('modified');
           } else {
             statusEl.textContent = 'Logged';
             statusEl.className = 'badge bg-success';
             btnEl.textContent = 'Un-log Meal';
             actionEl.value = 'unlog';
+            divEl.classList.add('logged');
             divEl.classList.remove('modified');
           }
         } else {
@@ -170,6 +172,7 @@
           statusEl.className = 'badge bg-secondary';
           btnEl.textContent = 'Log Meal';
           actionEl.value = 'log';
+          divEl.classList.remove('logged');
           divEl.classList.remove('modified');
         }
       }
