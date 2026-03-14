@@ -6,6 +6,7 @@ const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
 const archiver = require('archiver');
+const AdmZip = require('adm-zip');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -821,4 +822,101 @@ app.get('/export/all-json.zip', (req, res) => {
   archive.append(JSON.stringify(readGoals(), null, 2), { name: 'goals.json' });
   archive.append(JSON.stringify(readCheckIns(), null, 2), { name: 'check-ins.json' });
   archive.finalize();
+});
+
+// Import routes
+app.post('/import/meals', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  try {
+    const data = JSON.parse(req.files.file.data.toString());
+    fs.writeFileSync(path.join(__dirname, 'meals.json'), JSON.stringify(data, null, 2));
+    res.redirect('/settings');
+  } catch (err) {
+    res.status(400).send('Invalid JSON file');
+  }
+});
+
+app.post('/import/meal-options', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  try {
+    const data = JSON.parse(req.files.file.data.toString());
+    fs.writeFileSync(path.join(__dirname, 'meal-options.json'), JSON.stringify(data, null, 2));
+    res.redirect('/settings');
+  } catch (err) {
+    res.status(400).send('Invalid JSON file');
+  }
+});
+
+app.post('/import/meal-guide', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  try {
+    const data = JSON.parse(req.files.file.data.toString());
+    fs.writeFileSync(path.join(__dirname, 'meal-guide.json'), JSON.stringify(data, null, 2));
+    res.redirect('/settings');
+  } catch (err) {
+    res.status(400).send('Invalid JSON file');
+  }
+});
+
+app.post('/import/goals', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  try {
+    const data = JSON.parse(req.files.file.data.toString());
+    fs.writeFileSync(path.join(__dirname, 'goals.json'), JSON.stringify(data, null, 2));
+    res.redirect('/settings');
+  } catch (err) {
+    res.status(400).send('Invalid JSON file');
+  }
+});
+
+app.post('/import/check-ins', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  try {
+    const data = JSON.parse(req.files.file.data.toString());
+    fs.writeFileSync(path.join(__dirname, 'check-ins.json'), JSON.stringify(data, null, 2));
+    res.redirect('/settings');
+  } catch (err) {
+    res.status(400).send('Invalid JSON file');
+  }
+});
+
+app.post('/import/all-json', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  const zipPath = path.join(__dirname, 'temp.zip');
+  fs.writeFileSync(zipPath, req.files.file.data);
+  const extractPath = __dirname;
+  const zip = new AdmZip(zipPath);
+  zip.extractAllTo(extractPath, true);
+  fs.unlinkSync(zipPath);
+  res.redirect('/settings');
+});
+
+app.post('/import/pictures', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.files) return res.status(400).send('No files uploaded');
+  const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
+  const uploadsPath = path.join(__dirname, 'public', 'uploads');
+  files.forEach(file => {
+    const filePath = path.join(uploadsPath, file.name);
+    file.mv(filePath);
+  });
+  res.redirect('/settings');
+});
+
+app.post('/import/pictures-zip', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+  const zipPath = path.join(__dirname, 'temp-pictures.zip');
+  fs.writeFileSync(zipPath, req.files.file.data);
+  const extractPath = path.join(__dirname, 'public', 'uploads');
+  const zip = new AdmZip(zipPath);
+  zip.extractAllTo(extractPath, true);
+  fs.unlinkSync(zipPath);
+  res.redirect('/settings');
 });

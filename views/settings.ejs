@@ -94,6 +94,48 @@
             <% }); %>
           </div>
         </div>
+        <h3>Import Data</h3>
+        <p>Upload and import your data files:</p>
+        <div class="row">
+          <div class="col-md-4">
+            <h5>Import JSON Files</h5>
+            <form action="/import/meals" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="file" accept=".json" required>
+              <button type="submit" class="btn btn-sm btn-warning">Import Meals JSON</button>
+            </form>
+            <form action="/import/meal-options" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="file" accept=".json" required>
+              <button type="submit" class="btn btn-sm btn-warning">Import Meal Options JSON</button>
+            </form>
+            <form action="/import/meal-guide" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="file" accept=".json" required>
+              <button type="submit" class="btn btn-sm btn-warning">Import Meal Guide JSON</button>
+            </form>
+            <form action="/import/goals" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="file" accept=".json" required>
+              <button type="submit" class="btn btn-sm btn-warning">Import Goals JSON</button>
+            </form>
+            <form action="/import/check-ins" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="file" accept=".json" required>
+              <button type="submit" class="btn btn-sm btn-warning">Import Check-ins JSON</button>
+            </form>
+            <form action="/import/all-json" method="POST" enctype="multipart/form-data">
+              <input type="file" name="file" accept=".zip" required>
+              <button type="submit" class="btn btn-success">Import All JSON Files</button>
+            </form>
+          </div>
+          <div class="col-md-4">
+            <h5>Import Pictures</h5>
+            <form action="/import/pictures" method="POST" enctype="multipart/form-data" class="mb-2">
+              <input type="file" name="files" accept="image/*" multiple required>
+              <button type="submit" class="btn btn-info">Import Individual Pictures</button>
+            </form>
+            <form action="/import/pictures-zip" method="POST" enctype="multipart/form-data">
+              <input type="file" name="file" accept=".zip" required>
+              <button type="submit" class="btn btn-info">Import Pictures ZIP</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
