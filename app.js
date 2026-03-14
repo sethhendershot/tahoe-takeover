@@ -490,7 +490,8 @@ app.get('/goals', (req, res) => {
 app.get('/settings', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const checkInsData = readCheckIns();
-  res.render('settings', { user: req.session.user, checkInsData });
+  const pictures = fs.readdirSync(path.join(__dirname, 'public', 'uploads')).filter(f => /\.(jpg|jpeg|png|gif)$/i.test(f));
+  res.render('settings', { user: req.session.user, checkInsData, pictures });
 });
 
 app.get('/load-goals', (req, res) => {
@@ -918,5 +919,37 @@ app.post('/import/pictures-zip', (req, res) => {
   const zip = new AdmZip(zipPath);
   zip.extractAllTo(extractPath, true);
   fs.unlinkSync(zipPath);
+  res.redirect('/settings');
+});
+
+app.post('/link-picture', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  const { picture, date } = req.body;
+  if (!date) return res.status(400).send('Date required');
+  const checkInsData = readCheckIns();
+  if (!checkInsData[date]) checkInsData[date] = { pictures: [] };
+  if (!checkInsData[date].pictures) checkInsData[date].pictures = [];
+  if (!checkInsData[date].pictures.includes(picture)) {
+    checkInsData[date].pictures.push(picture);
+    writeCheckIns(checkInsData);
+  }
+  res.redirect('/settings');
+});
+
+app.post('/delete-picture', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  const { picture } = req.body;
+  const picPath = path.join(__dirname, 'public', 'uploads', picture);
+  if (fs.existsSync(picPath)) {
+    fs.unlinkSync(picPath);
+    // Also remove from check-ins
+    const checkInsData = readCheckIns();
+    Object.keys(checkInsData).forEach(date => {
+      if (checkInsData[date].pictures) {
+        checkInsData[date].pictures = checkInsData[date].pictures.filter(p => p !== picture);
+      }
+    });
+    writeCheckIns(checkInsData);
+  }
   res.redirect('/settings');
 });

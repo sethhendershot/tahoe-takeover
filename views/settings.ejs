@@ -136,6 +136,33 @@
             </form>
           </div>
         </div>
+        <h3>Manage Pictures</h3>
+        <div class="row">
+          <div class="col-md-12">
+            <% pictures.forEach(pic => { %>
+              <div class="d-inline-block m-2 text-center">
+                <img src="/uploads/<%= pic %>" class="img-thumbnail" style="width: 100px; height: 100px;" alt="<%= pic %>">
+                <br>
+                <small><%= pic %></small>
+                <br>
+                <form action="/link-picture" method="POST" class="d-inline">
+                  <input type="hidden" name="picture" value="<%= pic %>">
+                  <select name="date" class="form-select form-select-sm d-inline" style="width: auto;">
+                    <option value="">Link to Check-in</option>
+                    <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
+                      <option value="<%= date %>"><%= date %></option>
+                    <% }); %>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-primary">Link</button>
+                </form>
+                <form action="/delete-picture" method="POST" class="d-inline">
+                  <input type="hidden" name="picture" value="<%= pic %>">
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this picture?')">Delete</button>
+                </form>
+              </div>
+            <% }); %>
+          </div>
+        </div>
       </div>
     </div>
   </div>
