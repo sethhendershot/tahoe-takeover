@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/styles.css">
   <style>
     .logged { background-color: #d4edda !important; }
+    .modified { background-color: #fff3cd !important; }
   </style>
 </head>
 <body class="bg-light">
@@ -93,6 +94,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const selectedDate = '<%= selectedDate %>';
+      const modified = new Array(7).fill(false);
       loadMeals();
 
       function loadMeals() {
@@ -122,34 +124,53 @@
               document.getElementById(`proteinMeal${i}`).value = mealData.proteinMealId || '';
               document.getElementById(`carbsMeal${i}`).value = mealData.carbsMealId || '';
               document.getElementById(`fatsMeal${i}`).value = mealData.fatsMealId || '';
-              updateStatus(i, mealData);
+              modified[i] = false;
+              updateUI(i, mealData, false);
               filterSelect('protein', i);
               filterSelect('carbs', i);
               filterSelect('fats', i);
             }
+            // Add change listeners
+            for (let i = 1; i <= 6; i++) {
+              const inputs = document.querySelectorAll(`#mealDiv${i} input, #mealDiv${i} select`);
+              inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                  if (!modified[i]) {
+                    modified[i] = true;
+                    updateUI(i, data[i] || {}, true);
+                  }
+                });
+              });
+            }
           });
       }
 
-      function updateStatus(mealNum, mealData) {
+      function updateUI(mealNum, mealData, isModified) {
         const isLogged = (mealData.protein > 0 || mealData.carbs > 0 || mealData.fats > 0);
         const statusEl = document.getElementById(`status${mealNum}`);
         const btnEl = document.getElementById(`logBtn${mealNum}`);
         const actionEl = document.getElementById(`action${mealNum}`);
         const divEl = document.getElementById(`mealDiv${mealNum}`);
         if (isLogged) {
-          statusEl.textContent = 'Logged';
-          statusEl.className = 'badge bg-success';
-          btnEl.textContent = 'Un-log Meal';
-          btnEl.className = 'btn btn-danger mt-2';
-          actionEl.value = 'unlog';
-          divEl.classList.add('logged');
+          if (isModified) {
+            statusEl.textContent = 'Modified';
+            statusEl.className = 'badge bg-warning';
+            btnEl.textContent = 'Re-log Meal';
+            actionEl.value = 'log';
+            divEl.classList.add('modified');
+          } else {
+            statusEl.textContent = 'Logged';
+            statusEl.className = 'badge bg-success';
+            btnEl.textContent = 'Un-log Meal';
+            actionEl.value = 'unlog';
+            divEl.classList.remove('modified');
+          }
         } else {
           statusEl.textContent = 'Not Logged';
           statusEl.className = 'badge bg-secondary';
           btnEl.textContent = 'Log Meal';
-          btnEl.className = 'btn btn-primary mt-2';
           actionEl.value = 'log';
-          divEl.classList.remove('logged');
+          divEl.classList.remove('modified');
         }
       }
 
