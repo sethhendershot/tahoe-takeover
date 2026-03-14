@@ -1,0 +1,39 @@
+{
+  "meals": [
+    {
+      "id": 1772889533899,
+      "title": "Tilapia = 5 oz cooked",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772889559980,
+      "title": "Salmon = 5 oz cooked",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772889573705,
+      "title": "chicken breast = 4.3 oz cooked",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772889586787,
+      "title": "turkey breast = 3.8 oz cooked",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    },
+    {
+      "id": 1772889601401,
+      "title": "egg whites = 10 oz liquid whites (pre-cooked measure)",
+      "protein": 30,
+      "carb": 0,
+      "fats": 0
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "2026-03-07": {
+    "1": "1772890705555",
+    "meals": {
+      "1": {
+        "protein": 25,
+        "carbs": 0,
+        "fats": 0,
+        "proteinMealId": "1772889726052",
+        "carbsMealId": "",
+        "fatsMealId": ""
+      },
+      "2": {
+        "protein": 30,
+        "carbs": 0,
+        "fats": 0,
+        "proteinMealId": "1772889601401",
+        "carbsMealId": "",
+        "fatsMealId": ""
+      }
+    }
+  }
+}
