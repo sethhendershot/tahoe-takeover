@@ -94,7 +94,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const selectedDate = '<%= selectedDate %>';
-      const modified = new Array(6).fill(false);
+      const modified = new Array(5).fill(false);
+      const originalMeals = {};
       loadMeals();
 
       function loadMeals() {
@@ -126,6 +127,7 @@
               document.getElementById(`fatsMeal${i}`).value = mealData.fatsMealId || '';
               modified[i] = false;
               updateUI(i, mealData, false);
+              originalMeals[i] = { ...mealData };
               filterSelect('protein', i);
               filterSelect('carbs', i);
               filterSelect('fats', i);
@@ -175,6 +177,30 @@
           divEl.classList.remove('logged');
           divEl.classList.remove('modified');
         }
+        if (isModified) {
+          let cancelBtn = document.getElementById(`cancelBtn${mealNum}`);
+          if (!cancelBtn) {
+            cancelBtn = document.createElement('button');
+            cancelBtn.id = `cancelBtn${mealNum}`;
+            cancelBtn.className = 'btn btn-secondary mt-2 ms-2';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.type = 'button';
+            cancelBtn.onclick = () => {
+              document.getElementById(`protein${mealNum}`).value = originalMeals[mealNum].protein || '';
+              document.getElementById(`carbs${mealNum}`).value = originalMeals[mealNum].carbs || '';
+              document.getElementById(`fats${mealNum}`).value = originalMeals[mealNum].fats || '';
+              document.getElementById(`proteinMeal${mealNum}`).value = originalMeals[mealNum].proteinMealId || '';
+              document.getElementById(`carbsMeal${mealNum}`).value = originalMeals[mealNum].carbsMealId || '';
+              document.getElementById(`fatsMeal${mealNum}`).value = originalMeals[mealNum].fatsMealId || '';
+              modified[mealNum] = false;
+              updateUI(mealNum, originalMeals[mealNum], false);
+            };
+            btnEl.parentNode.insertBefore(cancelBtn, btnEl.nextSibling);
+          }
+        } else {
+          const cancelBtn = document.getElementById(`cancelBtn${mealNum}`);
+          if (cancelBtn) cancelBtn.remove();
+        }
       }
 
       // Form submit
@@ -182,6 +208,10 @@
         form.addEventListener('submit', function(e) {
           e.preventDefault();
           const data = Object.fromEntries(new FormData(this));
+          if (!data.proteinMealId && !data.carbsMealId && !data.fatsMealId) {
+            alert('Please select at least one meal option (Protein, Carbs, or Fats) before logging.');
+            return;
+          }
           fetch('/not-training-day', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
