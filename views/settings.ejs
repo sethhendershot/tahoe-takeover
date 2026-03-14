@@ -18,161 +18,180 @@
         <p class="mb-0">Version 1.0.0</p>
       </div>
       <div class="card-body">
-        <h3>Export Data</h3>
-        <p>Download your data files:</p>
-        <div class="row">
-          <div class="col-md-4">
-            <h5>JSON Files</h5>
-            <ul class="list-group mb-3">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Meals Data
-                <a href="/export/meals.json" class="btn btn-sm btn-primary" download>Download</a>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Meal Options
-                <a href="/export/meal-options.json" class="btn btn-sm btn-primary" download>Download</a>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Meal Guide
-                <a href="/export/meal-guide.json" class="btn btn-sm btn-primary" download>Download</a>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Goals
-                <a href="/export/goals.json" class="btn btn-sm btn-primary" download>Download</a>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Check-ins
-                <a href="/export/check-ins.json" class="btn btn-sm btn-primary" download>Download</a>
-              </li>
-            </ul>
-            <a href="/export/all-json.zip" class="btn btn-success" download>Export All JSON Files</a>
-          </div>
-          <div class="col-md-4">
-            <h5>All Uploaded Pictures</h5>
-            <p>Download all uploaded pictures as a ZIP file.</p>
-            <a href="/export/pictures.zip" class="btn btn-success" download>Download All Pictures ZIP</a>
-          </div>
-          <div class="col-md-4">
-            <h5>Selective Pictures Export</h5>
-            <p>Select check-ins to export their pictures:</p>
-            <form action="/export/selected-pictures" method="POST">
-              <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
-                <% if (checkInsData[date].pictures && checkInsData[date].pictures.length > 0) { %>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="dates" value="<%= date %>" id="check-<%= date %>">
-                    <label class="form-check-label" for="check-<%= date %>">
-                      <%= date %> <a href="#" data-bs-toggle="modal" data-bs-target="#modal-<%= date %>">(<%= checkInsData[date].pictures.length %> picture<%= checkInsData[date].pictures.length > 1 ? 's' : '' %>)</a>
-                    </label>
-                  </div>
-                <% } %>
-              <% }); %>
-              <button type="submit" class="btn btn-warning mt-3">Download Selected Pictures ZIP</button>
-            </form>
-            <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
-              <% if (checkInsData[date].pictures && checkInsData[date].pictures.length > 0) { %>
-                <!-- Modal -->
-                <div class="modal fade" id="modal-<%= date %>" tabindex="-1" aria-labelledby="modalLabel-<%= date %>" aria-hidden="true">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel-<%= date %>">Pictures for <%= date %></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="export-tab" data-bs-toggle="tab" data-bs-target="#export" type="button" role="tab" aria-controls="export" aria-selected="true">Export</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import" type="button" role="tab" aria-controls="import" aria-selected="false">Import</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manage-tab" data-bs-toggle="tab" data-bs-target="#manage" type="button" role="tab" aria-controls="manage" aria-selected="false">Manage Pictures</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="settingsTabsContent">
+          <div class="tab-pane fade show active" id="export" role="tabpanel" aria-labelledby="export-tab">
+            <h3>Export Data</h3>
+            <p>Download your data files:</p>
+            <div class="row">
+              <div class="col-md-4">
+                <h5>JSON Files</h5>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Meals Data
+                    <a href="/export/meals.json" class="btn btn-sm btn-primary" download>Download</a>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Meal Options
+                    <a href="/export/meal-options.json" class="btn btn-sm btn-primary" download>Download</a>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Meal Guide
+                    <a href="/export/meal-guide.json" class="btn btn-sm btn-primary" download>Download</a>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Goals
+                    <a href="/export/goals.json" class="btn btn-sm btn-primary" download>Download</a>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Check-ins
+                    <a href="/export/check-ins.json" class="btn btn-sm btn-primary" download>Download</a>
+                  </li>
+                </ul>
+                <a href="/export/all-json.zip" class="btn btn-success" download>Export All JSON Files</a>
+              </div>
+              <div class="col-md-4">
+                <h5>All Uploaded Pictures</h5>
+                <p>Download all uploaded pictures as a ZIP file.</p>
+                <a href="/export/pictures.zip" class="btn btn-success" download>Download All Pictures ZIP</a>
+              </div>
+              <div class="col-md-4">
+                <h5>Selective Pictures Export</h5>
+                <p>Select check-ins to export their pictures:</p>
+                <form action="/export/selected-pictures" method="POST">
+                  <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
+                    <% if (checkInsData[date].pictures && checkInsData[date].pictures.length > 0) { %>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="dates" value="<%= date %>" id="check-<%= date %>">
+                        <label class="form-check-label" for="check-<%= date %>">
+                          <%= date %> <a href="#" data-bs-toggle="modal" data-bs-target="#modal-<%= date %>">(<%= checkInsData[date].pictures.length %> picture<%= checkInsData[date].pictures.length > 1 ? 's' : '' %>)</a>
+                        </label>
                       </div>
-                      <div class="modal-body">
-                        <div class="row">
-                          <% checkInsData[date].pictures.forEach(pic => { %>
-                            <div class="col-md-6 mb-3">
-                              <img src="/uploads/<%= pic %>" class="img-fluid" alt="Picture">
+                    <% } %>
+                  <% }); %>
+                  <button type="submit" class="btn btn-warning mt-3">Download Selected Pictures ZIP</button>
+                </form>
+                <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
+                  <% if (checkInsData[date].pictures && checkInsData[date].pictures.length > 0) { %>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal-<%= date %>" tabindex="-1" aria-labelledby="modalLabel-<%= date %>" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel-<%= date %>">Pictures for <%= date %></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row">
+                              <% checkInsData[date].pictures.forEach(pic => { %>
+                                <div class="col-md-6 mb-3">
+                                  <img src="/uploads/<%= pic %>" class="img-fluid" alt="Picture">
+                                </div>
+                              <% }); %>
                             </div>
-                          <% }); %>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              <% } %>
-            <% }); %>
+                  <% } %>
+                <% }); %>
+              </div>
+            </div>
           </div>
-        </div>
-        <h3>Import Data</h3>
-        <p>Upload and import your data files:</p>
-        <div class="row">
-          <div class="col-md-4">
-            <h5>Import JSON Files</h5>
-            <form action="/import/meals" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="file" accept=".json" required>
-              <button type="submit" class="btn btn-sm btn-warning">Import Meals JSON</button>
-            </form>
-            <form action="/import/meal-options" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="file" accept=".json" required>
-              <button type="submit" class="btn btn-sm btn-warning">Import Meal Options JSON</button>
-            </form>
-            <form action="/import/meal-guide" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="file" accept=".json" required>
-              <button type="submit" class="btn btn-sm btn-warning">Import Meal Guide JSON</button>
-            </form>
-            <form action="/import/goals" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="file" accept=".json" required>
-              <button type="submit" class="btn btn-sm btn-warning">Import Goals JSON</button>
-            </form>
-            <form action="/import/check-ins" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="file" accept=".json" required>
-              <button type="submit" class="btn btn-sm btn-warning">Import Check-ins JSON</button>
-            </form>
-            <form action="/import/all-json" method="POST" enctype="multipart/form-data">
-              <input type="file" name="file" accept=".zip" required>
-              <button type="submit" class="btn btn-success">Import All JSON Files</button>
-            </form>
-          </div>
-          <div class="col-md-4">
-            <h5>Import Pictures</h5>
-            <form action="/import/pictures" method="POST" enctype="multipart/form-data" class="mb-2">
-              <input type="file" name="files" accept="image/*" multiple required>
-              <button type="submit" class="btn btn-info">Import Individual Pictures</button>
-            </form>
-            <form action="/import/pictures-zip" method="POST" enctype="multipart/form-data">
-              <input type="file" name="file" accept=".zip" required>
-              <button type="submit" class="btn btn-info">Import Pictures ZIP</button>
-            </form>
-          </div>
-        </div>
-        <h3>Manage Pictures</h3>
-        <% const linkedPictures = {}; %>
-        <% Object.keys(checkInsData).forEach(date => { %>
-          <% if (checkInsData[date].pictures) { %>
-            <% checkInsData[date].pictures.forEach(pic => { %>
-              <% linkedPictures[pic] = date; %>
-            <% }); %>
-          <% } %>
-        <% }); %>
-        <div class="row">
-          <div class="col-md-12">
-            <% pictures.forEach(pic => { %>
-              <% const linkedDate = linkedPictures[pic]; %>
-              <div class="d-inline-block m-2 text-center <%= !linkedDate ? 'border border-warning p-2' : '' %>">
-                <img src="/uploads/<%= pic %>" class="img-thumbnail" style="width: 100px; height: 100px;" alt="<%= pic %>">
-                <br>
-                <small><%= pic %></small>
-                <% if (!linkedDate) { %>
-                  <br><span class="badge bg-warning">Orphaned</span>
-                <% } %>
-                <br>
-                <form action="/link-picture" method="POST" class="d-inline">
-                  <input type="hidden" name="picture" value="<%= pic %>">
-                  <select name="date" class="form-select form-select-sm d-inline" style="width: auto;">
-                    <option value="">Link to Check-in</option>
-                    <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
-                      <option value="<%= date %>" <%= linkedDate === date ? 'selected' : '' %>><%= date %></option>
-                    <% }); %>
-                  </select>
-                  <button type="submit" class="btn btn-sm btn-primary">Link</button>
+          <div class="tab-pane fade" id="import" role="tabpanel" aria-labelledby="import-tab">
+            <h3>Import Data</h3>
+            <p>Upload and import your data files:</p>
+            <div class="row">
+              <div class="col-md-4">
+                <h5>Import JSON Files</h5>
+                <form action="/import/meals" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="file" accept=".json" required>
+                  <button type="submit" class="btn btn-sm btn-warning">Import Meals JSON</button>
                 </form>
-                <form action="/delete-picture" method="POST" class="d-inline">
-                  <input type="hidden" name="picture" value="<%= pic %>">
-                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this picture?')">Delete</button>
+                <form action="/import/meal-options" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="file" accept=".json" required>
+                  <button type="submit" class="btn btn-sm btn-warning">Import Meal Options JSON</button>
+                </form>
+                <form action="/import/meal-guide" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="file" accept=".json" required>
+                  <button type="submit" class="btn btn-sm btn-warning">Import Meal Guide JSON</button>
+                </form>
+                <form action="/import/goals" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="file" accept=".json" required>
+                  <button type="submit" class="btn btn-sm btn-warning">Import Goals JSON</button>
+                </form>
+                <form action="/import/check-ins" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="file" accept=".json" required>
+                  <button type="submit" class="btn btn-sm btn-warning">Import Check-ins JSON</button>
+                </form>
+                <form action="/import/all-json" method="POST" enctype="multipart/form-data">
+                  <input type="file" name="file" accept=".zip" required>
+                  <button type="submit" class="btn btn-success">Import All JSON Files</button>
                 </form>
               </div>
+              <div class="col-md-4">
+                <h5>Import Pictures</h5>
+                <form action="/import/pictures" method="POST" enctype="multipart/form-data" class="mb-2">
+                  <input type="file" name="files" accept="image/*" multiple required>
+                  <button type="submit" class="btn btn-info">Import Individual Pictures</button>
+                </form>
+                <form action="/import/pictures-zip" method="POST" enctype="multipart/form-data">
+                  <input type="file" name="file" accept=".zip" required>
+                  <button type="submit" class="btn btn-info">Import Pictures ZIP</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="manage" role="tabpanel" aria-labelledby="manage-tab">
+            <h3>Manage Pictures</h3>
+            <% const linkedPictures = {}; %>
+            <% Object.keys(checkInsData).forEach(date => { %>
+              <% if (checkInsData[date].pictures) { %>
+                <% checkInsData[date].pictures.forEach(pic => { %>
+                  <% linkedPictures[pic] = date; %>
+                <% }); %>
+              <% } %>
             <% }); %>
+            <div class="row">
+              <div class="col-md-12">
+                <% pictures.forEach(pic => { %>
+                  <% const linkedDate = linkedPictures[pic]; %>
+                  <div class="d-inline-block m-2 text-center <%= !linkedDate ? 'border border-warning p-2' : '' %>">
+                    <img src="/uploads/<%= pic %>" class="img-thumbnail" style="width: 100px; height: 100px;" alt="<%= pic %>">
+                    <br>
+                    <small><%= pic %></small>
+                    <% if (!linkedDate) { %>
+                      <br><span class="badge bg-warning">Orphaned</span>
+                    <% } %>
+                    <br>
+                    <form action="/link-picture" method="POST" class="d-inline">
+                      <input type="hidden" name="picture" value="<%= pic %>">
+                      <select name="date" class="form-select form-select-sm d-inline" style="width: auto;">
+                        <option value="">Link to Check-in</option>
+                        <% Object.keys(checkInsData).sort().reverse().forEach(date => { %>
+                          <option value="<%= date %>" <%= linkedDate === date ? 'selected' : '' %>><%= date %></option>
+                        <% }); %>
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-primary">Link</button>
+                    </form>
+                    <form action="/delete-picture" method="POST" class="d-inline">
+                      <input type="hidden" name="picture" value="<%= pic %>">
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this picture?')">Delete</button>
+                    </form>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
           </div>
         </div>
       </div>
