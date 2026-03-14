@@ -808,3 +808,17 @@ app.post('/export/selected-pictures', (req, res) => {
   });
   archive.finalize();
 });
+
+app.get('/export/all-json.zip', (req, res) => {
+  if (!req.session.user) return res.status(401).send('Unauthorized');
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="all-json.zip"');
+  archive.pipe(res);
+  archive.append(JSON.stringify(readMeals(), null, 2), { name: 'meals.json' });
+  archive.append(JSON.stringify(readData(), null, 2), { name: 'meal-options.json' });
+  archive.append(JSON.stringify(readGuide(), null, 2), { name: 'meal-guide.json' });
+  archive.append(JSON.stringify(readGoals(), null, 2), { name: 'goals.json' });
+  archive.append(JSON.stringify(readCheckIns(), null, 2), { name: 'check-ins.json' });
+  archive.finalize();
+});
