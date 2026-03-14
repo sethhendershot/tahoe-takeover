@@ -490,7 +490,14 @@ app.get('/goals', (req, res) => {
 app.get('/settings', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   const checkInsData = readCheckIns();
-  const pictures = fs.readdirSync(path.join(__dirname, 'public', 'uploads')).filter(f => /\.(jpg|jpeg|png|gif)$/i.test(f));
+  const uploadsPath = path.join(__dirname, 'public', 'uploads');
+
+  // Ensure uploads directory exists
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+  }
+
+  const pictures = fs.readdirSync(uploadsPath).filter(f => /\.(jpg|jpeg|png|gif)$/i.test(f));
   res.render('settings', { user: req.session.user, checkInsData, pictures });
 });
 
@@ -747,6 +754,12 @@ app.get('/export/check-ins.json', (req, res) => {
 app.get('/export/pictures.zip', (req, res) => {
   if (!req.session.user) return res.status(401).send('Unauthorized');
   const uploadsPath = path.join(__dirname, 'public', 'uploads');
+
+  // Ensure uploads directory exists
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+  }
+
   const archive = archiver('zip', { zlib: { level: 9 } });
   res.setHeader('Content-Type', 'application/zip');
   res.setHeader('Content-Disposition', 'attachment; filename="pictures.zip"');
@@ -880,9 +893,16 @@ app.post('/import/pictures', (req, res) => {
 app.post('/import/pictures-zip', (req, res) => {
   if (!req.session.user) return res.status(401).send('Unauthorized');
   if (!req.files || !req.files.file) return res.status(400).send('No file uploaded');
+
+  const extractPath = path.join(__dirname, 'public', 'uploads');
+
+  // Ensure uploads directory exists
+  if (!fs.existsSync(extractPath)) {
+    fs.mkdirSync(extractPath, { recursive: true });
+  }
+
   const zipPath = path.join(__dirname, 'temp-pictures.zip');
   fs.writeFileSync(zipPath, req.files.file.data);
-  const extractPath = path.join(__dirname, 'public', 'uploads');
   const zip = new AdmZip(zipPath);
   zip.extractAllTo(extractPath, true);
   fs.unlinkSync(zipPath);
